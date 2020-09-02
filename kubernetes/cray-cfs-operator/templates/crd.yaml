@@ -1,0 +1,139 @@
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: cfsessions.cms.cray.com
+spec:
+  group: cms.cray.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+  version: v1
+  scope: Namespaced
+  names:
+    plural: cfsessions
+    singular: cfsession
+    kind: ConfigFrameworkSession
+    shortNames:
+    - cfs
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          type: object
+          required: [repo]
+          properties:
+            repo:
+              type: object
+              required: [cloneUrl]
+              properties:
+                cloneUrl:
+                  type: string
+                branch:
+                  type: string
+                commit:
+                  type: string
+            ansible:
+              type: object
+              properties:
+                playbook:
+                  type: string
+                limit:
+                  type: string
+                config:
+                  type: string
+                verbosity:
+                  type: integer
+            target:
+              type: object
+              properties:
+                definition:
+                  type: string
+                groups:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      groups:
+                        type: array
+                        items:
+                          type: string
+            status:
+              type: object
+              properties:
+                session:
+                  type: object
+                  properties:
+                    job:
+                      type: string
+                    succeeded:
+                      type: string
+                    status:
+                      type: string
+                    startTime:
+                      type: string
+                      format: date-time
+                    completionTime:
+                      type: string
+                      format: date-time
+                targets:
+                  type: object
+                  properties:
+                    failed:
+                      type: integer
+                    succeeded:
+                      type: integer
+                    pending:
+                      type: integer
+                artifacts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      image_id:
+                        type: string
+                        format: uuid
+                      result_id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+
+
+  additionalPrinterColumns:
+  - name: Job
+    type: string
+    description: The name of the Execution environment job for this session
+    JSONPath: .spec.status.session.job
+  - name: Status
+    type: string
+    description: The current status of the session
+    JSONPath: .spec.status.session.status
+  - name: Succeeded
+    type: string
+    description: The success/failure of the session (null if it hasn't completed yet)
+    JSONPath: .spec.status.session.succeeded
+  - name: Repository Clone URL
+    type: string
+    description: The clone URL of the configuration content repository
+    JSONPath: .spec.repo.cloneUrl
+  - name: Branch
+    type: string
+    description: The branch of the repository at the cloneUrl to check out. Set branch of commit.
+    JSONPath: .spec.repo.branch
+  - name: Commit
+    type: string
+    description: The commit of the repository at the cloneUrl to check out. Set branch of commit.
+    JSONPath: .spec.repo.commit
+  - name: Playbook
+    type: string
+    description: The Ansible playbook to run
+    JSONPath: .spec.ansible.playbook
+  - name: Age
+    type: date
+    JSONPath: .metadata.creationTimestamp

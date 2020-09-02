@@ -1,0 +1,5 @@
+--index-url http://dst.us.cray.com/dstpiprepo/simple
+--trusted-host dst.us.cray.com
+pytest
+pytest-cov
+mock

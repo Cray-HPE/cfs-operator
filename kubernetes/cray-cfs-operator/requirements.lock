@@ -1,0 +1,6 @@
+dependencies:
+- name: cray-service
+  repository: http://helmrepo.dev.cray.com:8080
+  version: 1.1.17
+digest: sha256:f4f7be46060945b326e07f6f10e389be58f7e71e18f1ffaee1d17d46e9f1d563
+generated: "2019-10-13T03:11:03.7809822Z"

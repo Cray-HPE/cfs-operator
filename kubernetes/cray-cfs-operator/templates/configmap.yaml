@@ -1,0 +1,52 @@
+{{- $baseChartValues := index .Values "cray-service" -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cray-cfs-operator-config
+  namespace: services
+  labels:
+    app.kubernetes.io/name: {{ .Values.service_name }}
+data:
+  cray_cfs_util_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.util_image.repository }}:{{ .Values.util_image.version }}"
+  cray_cfs_aee_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.aee_image.repository }}:{{ .Values.aee_image.version }}"
+  cray_cfs_ims_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.ims_image.repository }}:{{ default .Chart.AppVersion .Values.ims_image.version }}"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.service_name }}
+  name: cfs-default-ansible-cfg
+  namespace: services
+data:
+  ansible.cfg: |
+    # config file for ansible -- https://ansible.com/
+    # ===============================================
+    # NOTE: cfs_aggregator must be included in the callback_whitelist to enable
+    # CFS reporting for individual sessions.
+    #
+    # WARNING: Changing some of these values may cause performance degredation.
+    #
+    # NOTE: Do not change the private_key_file value.
+    [defaults]
+    gathering             = smart
+    forks                 = 500
+    # For debugging, add additional callbacks
+    #callback_whitelist    = cfs_aggregator, timer, profile_tasks, profile_roles
+    callback_whitelist    = cfs_aggregator
+    host_key_checking     = False
+    private_key_file      = /secret/key
+    callback_plugins      = /usr/share/ansible/plugins/callback
+    strategy              = cfs_linear
+    any_errors_fatal      = False
+    deprecation_warnings  = False
+    display_ok_hosts      = no
+    display_skipped_hosts = no
+    interpreter_python    = /usr/bin/python3
+
+    [ssh_connection]
+    pipelining = True
+    ssh_args = -o ServerAliveInterval=30 -o ControlMaster=auto -o ControlPersist=60s
+

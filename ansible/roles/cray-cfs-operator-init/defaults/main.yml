@@ -1,0 +1,70 @@
+# Copyright 2019, Cray Inc. All Rights Reserved.
+---
+# The default url of the git repository which contains the configuration repository
+cray_cfs_git_clone_url: https://api-gw-service-nmn.local/vcs/cray/config-management.git
+
+# The default branch of the repository in {{ cray_cfs_git_clone_url }} to checkout
+cray_cfs_git_branch: master
+
+# If not using the management plane git instance (gitea), the config map
+# which contains the certificate authority public key used to download
+# the git repository in {{ cray_cfs_git_clone_url }}. This certificate will
+# be used to supply the value for GIT_SSL_CAINFO.
+#
+# If using the management plane git server instance, leave this value as is.
+cray_cfs_configmap_public_key: cray-configmap-ca-public-key
+
+# The key in the {{ cray_cfs_configmap_public_key }} config map which
+# contains the public key content.
+#
+# If using the management plane git server instance, leave this value as is.
+cray_cfs_ca_public_key: certificate_authority.crt
+
+# Image for the utility init container that downloads the git repository
+cray_cfs_util_image_org: alpine
+cray_cfs_util_image_name: git
+cray_cfs_util_image_version: 1.0.7
+cray_cfs_util_image: "{{ cray_stack_registry_source }}/{{ cray_cfs_util_image_org }}/{{ cray_cfs_util_image_name }}:{{ cray_cfs_util_image_version }}"
+
+# Image used for orchestrating interaction with IMS image targets for Image Customization
+cray_cfs_ims_image_org: cray
+cray_cfs_ims_image_name: cray-cfs-operator
+cray_cfs_ims_image_version: latest
+cray_cfs_ims_image:  "{{ cray_stack_registry_source }}/{{ cray_cfs_ims_image_org }}/{{ cray_cfs_ims_image_name }}:{{ cray_cfs_ims_image_version }}"
+
+# Image for storing CFSession target results
+cray_cfs_redis_image_org: library
+cray_cfs_redis_image_name: redis
+cray_cfs_redis_image_version: 5.0-alpine
+cray_cfs_redis_image: "{{ cray_stack_registry_source }}/{{ cray_cfs_redis_image_org }}/{{ cray_cfs_redis_image_name }}:{{ cray_cfs_redis_image_version }}"
+
+# Ansible Execution Environment image
+cray_cfs_aee_image_org: cray
+cray_cfs_aee_image_name: cray-aee
+cray_cfs_aee_image_version: latest
+cray_cfs_aee_image: "{{ cray_stack_registry_source }}/{{ cray_cfs_aee_image_org }}/{{ cray_cfs_aee_image_name }}:{{ cray_cfs_aee_image_version }}"
+
+# The private key that should be used for the Ansible Execution Environments to
+# access their target hosts. This key should exist on the groups['managers[0]']
+# host running this play (typically the first SMS node).
+cray_cfs_aee_private_key_path: /root/.ssh/id_rsa
+cray_cfs_aee_public_key_path: /root/.ssh/id_rsa.pub
+
+# The name of the Kubernetes secret which holds the private key used in the
+# Ansible execution environments spawned by the CFS operator
+cray_cfs_aee_private_key: cray-cfs-aee-privatekey
+
+# CFS Operator Image
+cray_cfs_operator_image_org: cray
+cray_cfs_operator_image_name: cray-cfs-operator
+cray_cfs_operator_image_version: latest
+cray_cfs_operator_image: "{{ cray_stack_registry_source }}/{{ cray_cfs_operator_image_org }}/{{ cray_cfs_operator_image_name }}:{{ cray_cfs_operator_image_version }}"
+
+# Cray Configuration Framework Service Kubernetes Namespace
+cray_cfs_namespace: services
+
+# Cray Configuration Framework Service Kubernetes Service Service Account
+cray_cfs_service_account: cray-cfs
+
+# Cray Configuration Framework Service Operator Log Level
+cray_cfs_operator_log_level: INFO

@@ -1,0 +1,78 @@
+# Copyright 2020 Hewlett Packard Enterprise Development LP
+#
+# Please refer to https://stash.us.cray.com/projects/CLOUD/repos/cray-charts/browse/stable/cray-service/values.yaml?at=refs%2Fheads%2Fmaster
+# for more info on values you can set/override
+# Note that cray-service.containers[*].image and cray-service.initContainers[*].image map values are one of the only structures that
+# differ from the standard kubernetes container spec:
+# image:
+#   repository: ""
+#   tag: "" (default = "latest")
+#   pullPolicy: "" (default = "IfNotPresent")
+
+util_image:
+  repository: alpine/git
+  version: 1.0.7
+ims_image:
+  repository: cray/cray-cfs-operator
+  version: "1.4.9"
+aee_image:
+  repository: cray/cray-aee
+  version: "@aee_image_tag@"
+
+cray-service:
+  type: Deployment
+  nameOverride: cray-cfs-operator
+  fullNameOverride: cray-cfs-operator
+  serviceAccountName: cray-cfs
+  labels:
+    app: cray-cfs-operator
+  containers:
+    - name: cray-cfs-operator
+      image:
+        repository: cray/cray-cfs-operator
+      env:
+      - name: CFS_OPERATOR_LOG_LEVEL
+        value: "INFO"
+      - name: CRAY_CFS_NAMESPACE
+        value: "services"
+      - name: CRAY_CFS_UTIL_IMAGE
+        valueFrom:
+          configMapKeyRef:
+            name: cray-cfs-operator-config
+            key: cray_cfs_util_image
+      - name: CRAY_CFS_AEE_IMAGE
+        valueFrom:
+          configMapKeyRef:
+            name: cray-cfs-operator-config
+            key: cray_cfs_aee_image
+      - name: CRAY_CFS_CONFIGMAP_PUBLIC_KEY
+        value: "cray-configmap-ca-public-key"
+      - name: CRAY_CFS_CA_PUBLIC_KEY
+        value: "certificate_authority.crt"
+      - name: CRAY_CFS_AEE_PRIVATE_KEY
+        value: "cray-cfs-aee-privatekey"
+      - name: CRAY_CFS_IMS_IMAGE
+        valueFrom:
+          configMapKeyRef:
+            name: cray-cfs-operator-config
+            key: cray_cfs_ims_image
+      - name: CRAY_CFS_SERVICE_ACCOUNT
+        value: "cray-cfs"
+      resources:
+        requests:
+          memory: "100Mi"
+          cpu: "5m"
+        limits:
+          memory: "250Mi"
+          cpu: "50m"
+      livenessProbe:
+        exec:
+         command:
+         - python3
+         - "-m"
+         - "cray.cfs.operator.liveness"
+        initialDelaySeconds: 10
+        periodSeconds: 30
+        timeoutSeconds: 3
+  service:
+    enabled: false

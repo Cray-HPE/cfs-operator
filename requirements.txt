@@ -1,0 +1,9 @@
+--index-url http://dst.us.cray.com/dstpiprepo/simple
+--trusted-host dst.us.cray.com
+-c constraints.txt
+cray-cfs-k8s
+dictdiffer
+kubernetes
+paramiko
+redis
+liveness
