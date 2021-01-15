@@ -1,0 +1,20 @@
+{# Copyright 2019, Cray Inc. All rights reserved. #}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cray-cfs-aee-privatekey
+  namespace: {{ cray_cfs_namespace }}
+type: Opaque
+data:
+  key: |
+{{ b64_rsa_privkey.stdout |indent(8, True) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cray-cfs-aee-pubkey
+  namespace: {{ cray_cfs_namespace }}
+data:
+  key: |
+{{ cfs_rsa_pubkey.stdout |indent(8, True) }}

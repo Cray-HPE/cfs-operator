@@ -1,0 +1,64 @@
+# Copyright 2019, Cray Inc. All Rights Reserved.
+---
+- name: Ensure /root/k8s/cfs directory exists
+  file: path=/root/k8s/cfs state=directory
+  delegate_to: "{{ groups['bis'][0] }}"
+  run_once: true
+
+- name: Check for PrivKey
+  stat:
+    path: "{{ cray_cfs_aee_private_key_path }}"
+  register: priv_stat_result
+  run_once: true
+  changed_when: false
+  delegate_to: "{{ groups['bis'][0] }}"
+
+- name: Check for PublicKey
+  stat:
+    path: "{{ cray_cfs_aee_public_key_path }}"
+  register: pub_stat_result
+  run_once: true
+  changed_when: false
+  delegate_to: "{{ groups['bis'][0] }}"
+
+# fail_msg becomes available in Ansible 2.7, so we don't see fail_msg currently
+- name: Assert Private Key Exists
+  assert:
+    that:
+      - "{{ item }}.stat.exists"
+    fail_msg: "'{{ cray_cfs_aee_private_key_path }}' does not exist; ensure private key information has been generated on {{ groups['bis'][0] }}."
+  run_once: true
+  delegate_to: "{{ groups['bis'][0] }}"
+  with_items:
+  - priv_stat_result
+  - pub_stat_result
+
+- name: Capture Private Key for AEE Privilages
+  shell: "cat {{ cray_cfs_aee_private_key_path }} | base64"
+  register: b64_rsa_privkey
+  no_log: true
+  delegate_to: "{{ groups['bis'][0] }}"
+  run_once: true
+  changed_when: false
+
+- name: Capture Public Key for AEE Image Customization
+  shell: "cat {{ cray_cfs_aee_public_key_path }}"
+  register: cfs_rsa_pubkey
+  no_log: true
+  delegate_to: "{{ groups['bis'][0] }}"
+  run_once: true
+  changed_when: false
+
+- name: Create CFS AEE Privkey Secret
+  template:
+    src: cfs-aee-keys.yaml.j2
+    dest: /root/k8s/cfs/cfs-aee-keys.yaml
+  delegate_to: "{{ groups['bis'][0] }}"
+  run_once: true
+
+- name: Apply CFS CRD spec
+  command: kubectl apply -f cfs-aee-keys.yaml
+  args:
+    chdir: /root/k8s/cfs
+  delegate_to: "{{ groups['bis'][0] }}"
+  run_once: true
