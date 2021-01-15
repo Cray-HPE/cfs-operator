@@ -1,0 +1,10 @@
+**/__pycache__
+**/*.pyc
+**/*.retry
+.env
+.coverage
+.nox
+.pytest_cache
+.vscode
+cfs-operator.code-workspace
+htmlcov

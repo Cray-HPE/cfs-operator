@@ -1,0 +1,17 @@
+apiVersion: v1
+description: "Kubernetes resources for cfs-operator"
+name: "cray-cfs-operator"
+home: "scms/cfs-operator"
+version: 1.9.6
+keywords:
+  - cfs
+  - cray-cfs-operator
+sources:
+  - "https://stash.us.cray.com/projects/SCMS/repos/cfs-operator/browse"
+maintainers:
+  - name: rbak
+    email: rbak@cray.com
+  - name: rkleinman
+    email: rkleinman@cray.com
+  - name: jasons
+    email: jasons@cray.com

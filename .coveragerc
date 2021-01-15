@@ -1,0 +1,9 @@
+# Copyright 2019, Cray Inc. All Rights Reserved.
+[run]
+omit =
+    */__main__.py
+    */__init__.py
+    */kafka_utils.py
+
+[report]
+fail_under=90
