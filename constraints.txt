@@ -34,11 +34,11 @@ PyNaCl==1.2.1
 pytest==4.2.1
 pytest-cov==2.6.1
 python-dateutil==2.7.5
-PyYAML==5.3.1
+PyYAML==5.4.1
 redis==3.2.1
 requests==2.22.0
 requests-oauthlib==1.0.0
-rsa==4.1
+rsa==4.7
 setuptools>=49.3.2
 urllib3==1.25.9
 virtualenv==15.2.0
