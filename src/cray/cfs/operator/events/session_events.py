@@ -44,7 +44,7 @@ wait_for_envoy_boilerplate = 'until curl --head localhost:15000; ' \
 # Boilerplate code to copy the certs created by cfs-trust/vault for use with
 # live nodes (not image customization) in AEE
 bootstrap_cfs_keys_boilerplate = 'mkdir -p /root/.ssh && ' \
-                                 'until [ -f {0}/ssh/id_ecdsa ]; do sleep 1; done' \
+                                 'until [ -f {0}/ssh/id_ecdsa ]; do sleep 1; done; ' \
                                  'cp -a {0}/ssh/* /root/.ssh/ && ' \
                                  'chmod 600 /root/.ssh/id_ecdsa && ' \
                                  'echo CFS trust keys migrated to /root/.ssh'.format(
