@@ -1,4 +1,4 @@
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 Functions for handling Job Events related to CFS.
 """
@@ -30,16 +30,25 @@ class CFSJobMonitor:
         self.namespace = env['RESOURCE_NAMESPACE']
         self.sessions = {}
 
-    def _init_sessions(self):
+    def _sync_sessions(self):
+        # Load incomplete and unmonitored sessions
         session_list = cfs_sessions.get_sessions()
         for session in session_list:
             session_status = session.get('status', {}).get('session', {})
-            if session_status.get('job') and not session_status.get('status') == 'complete':
+            if session['name'] not in self.sessions and \
+                    session_status.get('job') and \
+                    not session_status.get('status') == 'complete':
                 self.add_session(session)
 
     def _run(self):  # pragma: no cover
+        intervals = 0
         while True:
             self.monitor_sessions()
+            if intervals >= 10:
+                # Periodically check for out of sync sessions
+                self._sync_sessions()
+                intervals = 0
+            intervals += 1
             time.sleep(30)
 
     def _run_cleanup(self):  # pragma: no cover
@@ -48,7 +57,7 @@ class CFSJobMonitor:
             time.sleep(60*60)
 
     def run(self):  # pragma: no cover
-        self._init_sessions()
+        self._sync_sessions()
         threading.Thread(target=self._run).start()
         threading.Thread(target=self._run_cleanup).start()
 
