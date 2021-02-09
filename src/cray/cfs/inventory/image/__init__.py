@@ -1,4 +1,4 @@
-# Copyright 2019, Cray Inc. All rights reserved.
+# Copyright 2019,2021, Cray Inc. All rights reserved.
 """
 cray.cfs.inventory.image - Generate an inventory from the targets specification
 in a CFS session object when the target definition is 'image' for the purposes
@@ -321,7 +321,7 @@ class ImageRootInventory(CFSInventoryBase):
         """
         # Create Public Key
         host, port, session = get_IMS_API()
-        with open('/inventory/ssh/id_ecdsa.pub', 'r') as key_file:
+        with open('/inventory/ssh/id_image.pub', 'r') as key_file:
             key = key_file.read()
 
         LOGGER.info("Uploading public key to IMS for SSH container access.")
