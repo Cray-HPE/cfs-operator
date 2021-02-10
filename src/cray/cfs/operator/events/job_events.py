@@ -43,21 +43,34 @@ class CFSJobMonitor:
     def _run(self):  # pragma: no cover
         intervals = 0
         while True:
-            self.monitor_sessions()
-            if intervals >= 10:
-                # Periodically check for out of sync sessions
-                self._sync_sessions()
-                intervals = 0
+            try:
+                self.monitor_sessions()
+                if intervals >= 10:
+                    # Periodically check for out of sync sessions
+                    self._sync_sessions()
+                    intervals = 0
+            except Exception as e:
+                LOGGER.warning('Exception monitoring sessions: {}'.format(e))
             intervals += 1
             time.sleep(30)
 
     def _run_cleanup(self):  # pragma: no cover
         while True:
-            self.cleanup_jobs()
-            time.sleep(60*60)
+            try:
+                self.cleanup_jobs()
+                time.sleep(60*60)
+            except Exception as e:
+                LOGGER.warning('Exception running cleanup: {}'.format(e))
 
     def run(self):  # pragma: no cover
-        self._sync_sessions()
+        while True:
+            try:
+                self._sync_sessions()
+            except Exception as e:
+                LOGGER.warning('Exception during initial session sync: {}'.format(e))
+                time.sleep(30)
+            else:
+                break
         threading.Thread(target=self._run).start()
         threading.Thread(target=self._run_cleanup).start()
 
