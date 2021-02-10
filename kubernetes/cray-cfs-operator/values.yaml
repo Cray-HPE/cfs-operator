@@ -12,7 +12,7 @@ util_image:
   version: 1.0.15
 ims_image:
   repository: cray/cray-cfs-operator
-  version: latest
+  version: "@cfs_operator_image_tag@"
 aee_image:
   repository: cray/cray-aee
   version: "@aee_image_tag@"
