@@ -78,7 +78,7 @@ class CFSSessionController:
                 for event in kafka.consumer:
                     self._handle_event(event.value, kafka)
             except Exception as e:
-                LOGGER.warning(e)
+                LOGGER.warning('Exception handling kafka event: {}'.format(e))
 
     def _handle_event(self, event, kafka):
         try:
