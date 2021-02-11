@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 CFS Operator - A Python operator for the Cray Configuration Framework Service.
 """
@@ -36,10 +36,13 @@ def session_cleanup():
     """
     while True:
         time.sleep(60 * 5)  # Run every 5 minutes
-        options.update()
-        ttl = options.session_ttl
-        if ttl:
-            sessions.delete_sessions(status='complete', age=ttl)
+        try:
+            options.update()
+            ttl = options.session_ttl
+            if ttl:
+                sessions.delete_sessions(status='complete', age=ttl)
+        except Exception as e:
+            LOGGER.warning('Exception during session cleanup: {}'.format(e))
 
 
 def monotonic_liveliness_heartbeat():
