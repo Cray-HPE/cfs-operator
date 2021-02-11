@@ -1,4 +1,4 @@
-# Copyright 2019,2021, Cray Inc. All rights reserved.
+# Copyright 2019,2021 Hewlett Packard Enterprise Development LP
 """
 cray.cfs.inventory.image - Generate an inventory from the targets specification
 in a CFS session object when the target definition is 'image' for the purposes
@@ -99,6 +99,7 @@ class ImageRootInventory(CFSInventoryBase):
                     'cray_cfs_image': True,
                     # yuck, tested on SLE15 only
                     'ansible_python_interpreter': '/usr/bin/env python3',
+                    'ansible_ssh_private_key_file': '/etc/ansible/ssh/id_image',
                 }
 
         LOGGER.info("Generated image to job mapping=%s ", json.dumps(self.image_to_job, indent=2))
