@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 Watch the AEE container for an exit status. If this was an image customization
 run, then call IMS to teardown the SSH jail environment and capture back the
@@ -109,7 +109,7 @@ def _finish_the_job(job_id: str, cfs_name: str) -> None:
         if ssh_container['name'] == cfs_name:
             ssh_host = ssh_container['connection_info']['cluster.local']['host']
             ssh_port = ssh_container['connection_info']['cluster.local']['port']
-            key = paramiko.ecdsakey.ECDSAKey.from_private_key_file('/root/.ssh/id_ecdsa')
+            key = paramiko.ecdsakey.ECDSAKey.from_private_key_file('/root/.ssh/id_image')
             pclient = paramiko.SSHClient()
             for x in range(20):
                 try:
