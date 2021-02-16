@@ -1,4 +1,4 @@
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """ Test the cray/cfs/operator/v1/job_events.py module """
 from unittest.mock import patch, Mock
 
@@ -10,11 +10,11 @@ config.load_kube_config = Mock()
 from cray.cfs.operator.events.session_events import CFSJobMonitor
 
 
-def test__init_sessions(session_complete, session_running):
+def test__sync_sessions(session_complete, session_running):
     with patch('cray.cfs.operator.cfs.sessions.get_sessions') as get_sessions:
         get_sessions.return_value = [session_complete, session_running]
         monitor = CFSJobMonitor({'RESOURCE_NAMESPACE': 'foo'})
-        monitor._init_sessions()
+        monitor._sync_sessions()
         assert(len(monitor.sessions) == 1)
         assert(list(monitor.sessions.keys())[0] == session_running['name'])
 
