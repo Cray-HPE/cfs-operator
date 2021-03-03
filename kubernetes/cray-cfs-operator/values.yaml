@@ -61,11 +61,11 @@ cray-service:
         value: "cray-cfs"
       resources:
         requests:
-          memory: "100Mi"
-          cpu: "5m"
+          memory: "150Mi"
+          cpu: "200m"
         limits:
           memory: "250Mi"
-          cpu: "50m"
+          cpu: "500m"
       livenessProbe:
         exec:
           command:
