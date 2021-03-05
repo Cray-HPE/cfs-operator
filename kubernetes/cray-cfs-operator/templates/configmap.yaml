@@ -10,7 +10,7 @@ metadata:
 data:
   cray_cfs_util_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.util_image.repository }}:{{ .Values.util_image.version }}"
   cray_cfs_aee_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.aee_image.repository }}:{{ .Values.aee_image.version }}"
-  cray_cfs_ims_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.ims_image.repository }}:{{ default .Chart.AppVersion .Values.ims_image.version }}"
+  cray_cfs_ims_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.ims_image.repository }}:{{ .Values.ims_image.version | default $baseChartValues.global.appVersion }}"
 
 ---
 apiVersion: v1
