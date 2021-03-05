@@ -23,6 +23,7 @@ LOGGER = logging.getLogger('cray.cfs.operator.events.session_events')
 DEFAULT_ANSIBLE_CONFIG = 'cfs-default-ansible-cfg'
 DEFAULT_ANSIBLE_VERBOSITY = 0
 SHARED_DIRECTORY = '/inventory'
+VCS_USER_CREDENTIALS_DIR = '/etc/cray/vcs'
 
 try:
     config.load_incluster_config()
@@ -154,6 +155,26 @@ class CFSSessionController:
             name='SSL_CAINFO',
             value='/etc/cray/ca/certificate_authority.crt'
         )
+        self._job_env['VCS_USER'] = client.V1EnvVar(
+            name='VCS_USER',
+            value_from=client.V1EnvVarSource(
+                secret_key_ref=client.V1SecretKeySelector(
+                    key='vcs_username',
+                    name=self.env.get('VCS_USER_CREDENTIALS', 'vcs-user-credentials'),
+                    optional=False
+                )
+            )
+        )
+        self._job_env['VCS_PASSWORD'] = client.V1EnvVar(
+            name='VCS_PASSWORD',
+            value_from=client.V1EnvVarSource(
+                secret_key_ref=client.V1SecretKeySelector(
+                    key='vcs_password',
+                    name=self.env.get('VCS_USER_CREDENTIALS', 'vcs-user-credentials'),
+                    optional=False
+                )
+            )
+        )
 
     def _set_volume_mounts(self):
         """
@@ -259,16 +280,25 @@ class CFSSessionController:
         repos = [(i, layer['cloneUrl'], layer['commit']) for i, layer in configuration]
         if options.additional_inventory_url:
             repos.append(('hosts', options.additional_inventory_url, 'master'))
-        for i, cloneUrl, commit in repos:
+        for i, clone_url, commit in repos:
             directory = SHARED_DIRECTORY + '/layer' + i
             if i == 'hosts':
                 directory = SHARED_DIRECTORY + '/hosts'
+
             git_command = 'mkdir -p {2} && git clone {0} {2} && cd {2} && git checkout {1}'.format(
-                cloneUrl, commit, directory)
+                clone_url, commit, directory)
+
+            split_url = clone_url.split('/')
+            git_credentials_helper = 'git config --global credential.helper store'
+            git_credentials_setup = 'echo "{}" > ~/.git-credentials'.format(
+                ''.join([split_url[0], '//${VCS_USER}:${VCS_PASSWORD}@', split_url[2]])
+            )
 
             git_retry = 'RETRIES={}; '\
                         'DELAY={}; '\
                         'COUNT=1; '\
+                        '{}; '\
+                        '{}; '\
                         'while true; do '\
                         '{}; '\
                         'if [ $? -eq 0 ]; then '\
@@ -285,6 +315,8 @@ class CFSSessionController:
                         'done'.format(
                             self.env.get('CFS_GIT_RETRY_MAX', 60),
                             self.env.get('CFS_GIT_RETRY_DELAY', 10),
+                            git_credentials_setup,
+                            git_credentials_helper,
                             git_command)
 
             git_clone_container = client.V1Container(
@@ -294,7 +326,9 @@ class CFSSessionController:
                     self._job_volume_mounts['CONFIG_VOL'],
                     self._job_volume_mounts['CA_PUBKEY']
                 ],  # V1VolumeMount
-                env=[self._job_env['GIT_SSL_CAINFO'], ],  # env
+                env=[self._job_env['GIT_SSL_CAINFO'],
+                     self._job_env['VCS_USER'],
+                     self._job_env['VCS_PASSWORD']],  # env
                 command=["/bin/sh", "-c"],  # command
                 args=[git_retry],  # args
             )  # V1Container

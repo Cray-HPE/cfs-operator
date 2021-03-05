@@ -59,6 +59,8 @@ cray-service:
             key: cray_cfs_ims_image
       - name: CRAY_CFS_SERVICE_ACCOUNT
         value: "cray-cfs"
+      - name : VCS_USER_CREDENTIALS
+        value: "vcs-user-credentials"
       resources:
         requests:
           memory: "150Mi"
