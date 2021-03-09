@@ -72,14 +72,14 @@ def update_session(session_id, data):
     return cfs_session
 
 
-def delete_sessions(status=None, age=None):
+def delete_sessions(status=None, min_age=None):
     """Get information for a single CFS session"""
     url = ENDPOINT
     params = {}
     if status:
         params['status'] = status
-    if age:
-        params['age'] = age
+    if min_age:
+        params['min_age'] = min_age
     session = requests_retry_session()
     try:
         response = session.delete(url, params=params)

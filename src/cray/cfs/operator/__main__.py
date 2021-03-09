@@ -40,7 +40,7 @@ def session_cleanup():
             options.update()
             ttl = options.session_ttl
             if ttl:
-                sessions.delete_sessions(status='complete', age=ttl)
+                sessions.delete_sessions(status='complete', min_age=ttl)
         except Exception as e:
             LOGGER.warning('Exception during session cleanup: {}'.format(e))
 
