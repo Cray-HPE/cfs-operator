@@ -271,14 +271,16 @@ class CFSSessionController:
             ),  # V1SecretVolumeSource
         )  # V1Volume
 
-    def _get_clone_containers(self, configuration):
+    def _get_clone_containers(self, configuration, additional_inventory):
         """
         Create the list of containers to clone repos in the configurations
         for this session.
         """
         clone_containers = []
         repos = [(i, layer['cloneUrl'], layer['commit']) for i, layer in configuration]
-        if options.additional_inventory_url:
+        if additional_inventory:
+            repos.append(('hosts', additional_inventory['cloneUrl'], additional_inventory['commit']))
+        elif options.additional_inventory_url:
             repos.append(('hosts', options.additional_inventory_url, 'master'))
         for i, clone_url, commit in repos:
             directory = SHARED_DIRECTORY + '/layer' + i
@@ -500,6 +502,7 @@ class CFSSessionController:
             configuration_name = session_data['configuration']['name']
             configuration = get_configuration(configuration_name).get('layers', [])
             configuration_limit = session_data['configuration'].get('limit', '')
+            additional_inventory = get_configuration(configuration_name).get('additional_inventory', {})
         else:  # DEPRECATED v1
             repo_data = session_data['repo']
             configuration = [{'commit': repo_data.get('commit', repo_data.get('branch')),
@@ -530,7 +533,7 @@ class CFSSessionController:
         self._set_volumes(ansible_config)
 
         # Git clone containers
-        clone_containers = self._get_clone_containers(configuration)
+        clone_containers = self._get_clone_containers(configuration, additional_inventory)
 
         # Inventory container
         inventory_container = self._get_inventory_container(session_data)
