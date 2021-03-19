@@ -221,7 +221,7 @@ def do_success(image_id: str, job_id: str, cfs_name: str, cfs_namespace: str, qu
         resultant_image_id = response['resultant_image_id']
         if resultant_image_id is not None:
             LOGGER.info(
-                "Resultant image=%s from customization of image=%s", image_id, resultant_image_id
+                "Resultant image=%s from customization of image=%s", resultant_image_id, image_id
             )
             queue.put(('result', image_id, job_id, resultant_image_id))
             break
