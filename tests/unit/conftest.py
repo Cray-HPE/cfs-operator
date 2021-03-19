@@ -1,4 +1,4 @@
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 Shared pytest fixtures for cfs-operator
 """
@@ -109,7 +109,7 @@ def session_data_v1(session_name, job_id):
         },
         'repo': {
             'branch': 'testbranch',
-            'cloneUrl': 'testurl',
+            'cloneUrl': 'https://testurl/repo',
         }
     }
 
@@ -242,7 +242,7 @@ def config_response():
         'layers': [
             {
                 'commit': 'testcommit',
-                'cloneUrl': 'testurl',
+                'cloneUrl': 'https://testurl/repo',
                 'playbook': 'foo.yml'
             }
         ]
@@ -251,5 +251,6 @@ def config_response():
 
 @pytest.fixture()
 def mock_options():
-    options = MagicMock(default_ansible_config='testconfig')
+    options = MagicMock(default_ansible_config='testconfig',
+                        additional_inventory_url='https://testurl/additional')
     return options
