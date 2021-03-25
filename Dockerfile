@@ -1,5 +1,5 @@
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
-FROM dtr.dev.cray.com/baseos/alpine:3.12.0 as base
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
+FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.12.4 as base
 WORKDIR /app
 RUN apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash
 ADD constraints.txt requirements.txt /app/
