@@ -499,10 +499,11 @@ class CFSSessionController:
         """
         options.update()
         if 'configuration' in session_data:
+            cfs_config = get_configuration(configuration_name)
             configuration_name = session_data['configuration']['name']
-            configuration = get_configuration(configuration_name).get('layers', [])
+            configuration = cfs_config.get('layers', [])
             configuration_limit = session_data['configuration'].get('limit', '')
-            additional_inventory = get_configuration(configuration_name).get('additional_inventory', {})
+            additional_inventory = cfs_config.get('additional_inventory', {})
         else:  # DEPRECATED v1
             repo_data = session_data['repo']
             configuration = [{'commit': repo_data.get('commit', repo_data.get('branch')),
