@@ -499,8 +499,8 @@ class CFSSessionController:
         """
         options.update()
         if 'configuration' in session_data:
-            cfs_config = get_configuration(configuration_name)
             configuration_name = session_data['configuration']['name']
+            cfs_config = get_configuration(configuration_name)
             configuration = cfs_config.get('layers', [])
             configuration_limit = session_data['configuration'].get('limit', '')
             additional_inventory = cfs_config.get('additional_inventory', {})
