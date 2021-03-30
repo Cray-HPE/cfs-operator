@@ -1,21 +1,23 @@
 # Copyright 2019-2021 Hewlett Packard Enterprise Development LP
-FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.12.4 as base
+ARG BASE_CONTAINER=arti.dev.cray.com/baseos-docker-master-local/alpine:3.13.2
+FROM ${BASE_CONTAINER} as base
+ARG PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 WORKDIR /app
 RUN apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash
 ADD constraints.txt requirements.txt /app/
-RUN PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple \
+RUN PIP_INDEX_URL=${PIP_INDEX_URL} \
     pip3 install --no-cache-dir -U pip && \
     pip3 install --no-cache-dir -U wheel && \
     pip3 install --no-cache-dir -r requirements.txt
 COPY src/ /app/lib
-COPY .version /app/
+COPY .version /app/lib/
 RUN cd /app/lib && pip3 install --no-cache-dir .
 
 # Nox Environment
 FROM base as nox
+ARG PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 COPY requirements-dev.txt noxfile.py /app/
-RUN PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple \
-    pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt
+RUN pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt
 
 # Unit testing
 FROM nox as testing
@@ -25,7 +27,7 @@ ENV BUILDENV=pipeline
 CMD ["nox", "--nocolor", "-s", "unittests"]
 
 # Linting
-FROM nox as lint
+FROM testing as lint
 COPY requirements-lint.txt .flake8 sonar-project.properties /app/
 ENV BUILDENV=pipeline
 CMD ["nox", "--nocolor", "-s", "lint"]

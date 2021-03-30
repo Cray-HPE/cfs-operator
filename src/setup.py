@@ -1,13 +1,16 @@
 # setup.py for cray-cfs-operator
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 from setuptools import setup, find_namespace_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open(".version", 'r') as vf:
+    version = vf.read()
+
 setup(
     name="cray-cfs",
-    version="1.0.0",
+    version=version,
     author="Cray Inc.",
     author_email="sps@cray.com",
     description="Cray Configuration Framework Service",

@@ -63,6 +63,6 @@ def lint(session):
     if runtime == 'pipeline':
         session.run(
             '/bin/cp',
-            '/app/.version', '/app/sonar-project.properties',
+            '/app/lib/.version', '/app/sonar-project.properties',
             '/results'
         )
