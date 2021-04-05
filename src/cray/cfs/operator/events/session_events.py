@@ -279,7 +279,9 @@ class CFSSessionController:
         clone_containers = []
         repos = [(i, layer['cloneUrl'], layer['commit']) for i, layer in configuration]
         if additional_inventory:
-            repos.append(('hosts', additional_inventory['cloneUrl'], additional_inventory['commit']))
+            repos.append(
+                ('hosts', additional_inventory['cloneUrl'], additional_inventory['commit'])
+            )
         elif options.additional_inventory_url:
             repos.append(('hosts', options.additional_inventory_url, 'master'))
         for i, clone_url, commit in repos:
@@ -510,6 +512,7 @@ class CFSSessionController:
                               'cloneUrl': repo_data['cloneUrl'],
                               'playbook': session_data['ansible'].get('playbook', 'site.yml')}]
             configuration_limit = ''
+            additional_inventory = ''
 
         if configuration_limit:
             limits = configuration_limit.split(',')

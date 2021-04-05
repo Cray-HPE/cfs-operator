@@ -5,3 +5,7 @@
 #
 
 ./update_tags.sh
+
+VERSION=`cat .version`
+sed -i s/@VERSION@/${VERSION}/g kubernetes/cray-cfs-operator/Chart.yaml
+
