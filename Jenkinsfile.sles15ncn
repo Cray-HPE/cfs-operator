@@ -3,5 +3,5 @@ rpmBuild(
     product: "csm",
     target_node: "ncn",
     channel: "casmcms-builds",
-    fanout_params: ["sle15sp1"]
+    fanout_params: ["sle15sp1", "sle15sp2"]
 )
