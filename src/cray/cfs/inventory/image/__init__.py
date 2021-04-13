@@ -178,7 +178,7 @@ class ImageRootInventory(CFSInventoryBase):
         except requests.exceptions.HTTPError as err:
             raise CFSInventoryError(
                 'Unable to determine the name of IMS image=%r. Reason: %s' % (ims_id, err)
-            )
+            ) from err
 
         # Call IMS to kick off a customization job
         body = {
