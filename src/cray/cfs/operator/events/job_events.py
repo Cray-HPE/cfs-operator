@@ -132,13 +132,11 @@ class CFSJobMonitor:
                 LOGGER.warning("Unable to fetch Job=%s", job_name, e)
                 return False
         session_status = session.get('status', {}).get('session', {})
-        if job.status.start_time and not session_status.get('startTime'):
+        if job.status.start_time and session_status.get('status') == 'pending':
             LOGGER.info("EVENT: JobStart %s", session_name)
-            start_time = job.status.start_time.isoformat().split('+')[0]
-            cfs_sessions.update_session_status(session_name, data={'status': 'running',
-                                                                   'startTime': start_time})
-            # Set so that update_session_status is not called again for startTime
-            session_status['start_time'] = True
+            cfs_sessions.update_session_status(session_name, data={'status': 'running'})
+            # Set so that update_session_status is not called again for status
+            session_status['status'] = 'running'
         if job.status.completion_time:
             LOGGER.info("EVENT: JobComplete %s", session_name)
             completion_time = job.status.completion_time.isoformat().split('+')[0]
