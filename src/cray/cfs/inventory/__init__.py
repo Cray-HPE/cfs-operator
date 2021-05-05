@@ -1,4 +1,4 @@
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 cray.cfs.inventory - Base class and factory for generating inventories from a
 CFS Session for use with the Ansible Execution Environment.
@@ -45,13 +45,11 @@ class CFSInventoryBase(object):
     """ Base class for inventory generators """
     inventory_dir = "/inventory/hosts"
     inventory_file = inventory_dir + "/01-cfs-generated.yaml"
-    inventory_complete_file = "/inventory/complete"
 
-    def __init__(self, session, inventory_file=None, namespace=None, inventory_complete_file=None):
+    def __init__(self, session, inventory_file=None, namespace=None):
         self.inventory_file = inventory_file or self.inventory_file
         self.session = session
         self.cfs_namespace = namespace
-        self.inventory_complete_file = inventory_complete_file or self.inventory_complete_file
         self.cfs_name = self.session['name']
 
     def _dict2AnsibleInventory(self, grp_members: Dict[str, Iterable]):
@@ -71,10 +69,6 @@ class CFSInventoryBase(object):
     def generate(self):
         """ Generate the inventory and return it """
         pass
-
-    def complete(self):
-        """ Actions to take when the inventory generation is complete """
-        return Path(self.inventory_complete_file).touch()
 
     def write(self, inventory=None):
         LOGGER.info("Writing out the inventory to %s", self.inventory_file)
