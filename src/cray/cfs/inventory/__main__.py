@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
 """
 CFS Inventory - module to generate inventory from a CFS Session for use with
 the Ansible Execution Environment.
@@ -18,6 +18,13 @@ from cray.cfs.logging import setup_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 
 LOGGER = logging.getLogger('cray.cfs.inventory')
+INVENTORY_COMPLETE_FILE = "/inventory/complete"
+
+
+def mark_completed(exit_code=0):
+    """ Actions to take when the inventory generation is complete """
+    with open(INVENTORY_COMPLETE_FILE, 'w') as f:
+        f.write(str(exit_code))
 
 
 def main():
@@ -28,7 +35,7 @@ def main():
         LOGGER.error(
             "SESSION_NAME and RESOURCE_NAMESPACE must be present as environment variables."
         )
-        return 1
+        raise
 
     version = get_distribution('cray-cfs').version
     LOGGER.info(
@@ -49,7 +56,6 @@ def main():
         inventory_generator = factory.create(inventory_target, cfs_session, namespace=cfs_namespace)
     except ValueError as err:
         LOGGER.error("%s is not a valid inventory target definition.", inventory_target)
-        inventory_generator.complete()
         raise CFSInventoryError('Inventory generation failed') from err
 
     # Catch and log exceptions, but don't fail on them so that the complete
@@ -62,12 +68,18 @@ def main():
             "An error occurred while attempting to generate the inventory. "
             "Error: %s", err
         )
+        raise
     except Exception as err:
         LOGGER.error("An unknown exception occurred: {}".format(err))
-
-    inventory_generator.complete()
+        raise
 
 
 if __name__ == "__main__":
     setup_logging()
-    sys.exit(main())
+    exit_code = 0
+    try:
+        exit_code = main()
+    except Exception:
+        exit_code = 1
+    mark_completed(exit_code)
+    sys.exit(exit_code)

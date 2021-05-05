@@ -149,7 +149,8 @@ class ImageRootInventory(CFSInventoryBase):
             # Process results into dictionary
             launched = set(image_groups)
             completed = set()
-            while completed != launched:
+            # We have already joined all processes, we can iterate until empty
+            while not mpq.empty():
                 returned_ims_id, job_id, image_name, host, port = mpq.get()
                 LOGGER.info(
                     "Received ssh container result=%s",
@@ -158,6 +159,9 @@ class ImageRootInventory(CFSInventoryBase):
                 ssh_containers.update({returned_ims_id: (job_id, image_name, host, port)})
                 LOGGER.debug("ssh_containers= %s", ssh_containers)
                 completed.add(returned_ims_id)
+
+            if completed != launched:
+                raise CFSInventoryError('One or more IMS jobs failed to launch.')
 
             return ssh_containers
 
@@ -178,7 +182,7 @@ class ImageRootInventory(CFSInventoryBase):
         except requests.exceptions.HTTPError as err:
             raise CFSInventoryError(
                 'Unable to determine the name of IMS image=%r. Reason: %s' % (ims_id, err)
-            )
+            ) from err
 
         # Call IMS to kick off a customization job
         body = {

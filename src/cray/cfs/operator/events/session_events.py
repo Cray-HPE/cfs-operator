@@ -289,39 +289,41 @@ class CFSSessionController:
             if i == 'hosts':
                 directory = SHARED_DIRECTORY + '/hosts'
 
-            git_command = 'mkdir -p {2} && git clone {0} {2} && cd {2} && git checkout {1}'.format(
-                clone_url, commit, directory)
-
             split_url = clone_url.split('/')
             git_credentials_helper = 'git config --global credential.helper store'
             git_credentials_setup = 'echo "{}" > ~/.git-credentials'.format(
                 ''.join([split_url[0], '//${VCS_USER}:${VCS_PASSWORD}@', split_url[2]])
             )
 
-            git_retry = 'RETRIES={}; '\
-                        'DELAY={}; '\
-                        'COUNT=1; '\
-                        '{}; '\
-                        '{}; '\
-                        'while true; do '\
-                        '{}; '\
-                        'if [ $? -eq 0 ]; then '\
-                        'echo "Cloning successful"; '\
-                        'exit 0; '\
-                        'fi; '\
-                        'if [ $COUNT -gt $RETRIES ]; then '\
-                        'echo "Cloning exceeded retry limit - Stopping"; '\
-                        'exit 1; '\
-                        'fi; '\
-                        'echo "Cloning failed - Retrying"; '\
-                        'let COUNT=$COUNT+1; '\
-                        'sleep $DELAY; '\
-                        'done'.format(
-                            self.env.get('CFS_GIT_RETRY_MAX', 60),
-                            self.env.get('CFS_GIT_RETRY_DELAY', 10),
-                            git_credentials_setup,
-                            git_credentials_helper,
-                            git_command)
+            git_command = 'RETRIES={retries}; '\
+                          'DELAY={delay}; '\
+                          'COUNT=1; '\
+                          '{creds_setup}; '\
+                          '{creds_helper}; '\
+                          'mkdir -p {directory}; '\
+                          'while true; do '\
+                          'git clone {clone_url} {directory}; '\
+                          'if [ $? -eq 0 ]; then '\
+                          'echo "Cloning successful"; '\
+                          'cd {directory}; '\
+                          'git checkout {commit}; '\
+                          'exit 0; '\
+                          'fi; '\
+                          'if [ $COUNT -gt $RETRIES ]; then '\
+                          'echo "Cloning exceeded retry limit - Stopping"; '\
+                          'exit 1; '\
+                          'fi; '\
+                          'echo "Cloning failed - Retrying"; '\
+                          'let COUNT=$COUNT+1; '\
+                          'sleep $DELAY; '\
+                          'done'.format(
+                              retries=self.env.get('CFS_GIT_RETRY_MAX', 60),
+                              delay=self.env.get('CFS_GIT_RETRY_DELAY', 10),
+                              creds_setup=git_credentials_setup,
+                              creds_helper=git_credentials_helper,
+                              clone_url=clone_url,
+                              commit=commit,
+                              directory=directory)
 
             git_clone_container = client.V1Container(
                 name='git-clone-' + i,
@@ -334,7 +336,7 @@ class CFSSessionController:
                      self._job_env['VCS_USER'],
                      self._job_env['VCS_PASSWORD']],  # env
                 command=["/bin/sh", "-c"],  # command
-                args=[git_retry],  # args
+                args=[git_command],  # args
             )  # V1Container
             clone_containers.append(git_clone_container)
 
