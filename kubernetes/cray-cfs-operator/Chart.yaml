@@ -2,7 +2,7 @@ apiVersion: v1
 description: "Kubernetes resources for cfs-operator"
 name: "cray-cfs-operator"
 home: "scms/cfs-operator"
-version: 1.9.18
+version: @VERSION@
 keywords:
   - cfs
   - cray-cfs-operator
