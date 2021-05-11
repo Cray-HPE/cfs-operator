@@ -1,4 +1,3 @@
-# Copyright 2019, Cray Inc. All Rights Reserved.
 [run]
 omit =
     */__main__.py
