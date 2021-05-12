@@ -1,6 +1,4 @@
-#!/usr/bin/env sh
-
-#
+#!/bin/bash
 # Copyright 2020-2021 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,8 +20,10 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 # (MIT License)
-#
 
 ./update_tags.sh || exit 1
-./update_versions.sh
-exit $?
+
+./install_cms_meta_tools.sh || exit 1
+./cms_meta_tools/update_versions/update_versions.sh || exit 1
+rm -rf ./cms_meta_tools
+exit 0
