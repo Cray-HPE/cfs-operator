@@ -104,9 +104,9 @@ Crayons should fork this repository and provide a pull request to the current re
 ## Versioning
 
 We use [SemVer](semver.org) for versioning. The version is located in the [.version](.version) file. Other files either
-read the version string from this file or have this version string written to them at build time using the 
-[update_versions.sh](update_versions.sh) script, based on the information in the 
-[update_versions.conf](update_versions.conf) file.
+read the version string from this file or have this version string written to them at build time 
+based on the information in the [update_versions.conf](update_versions.conf) file (using the 
+update_versions.sh script in the cms-meta-tools repo).
 
 ## Authors
 
