@@ -25,6 +25,7 @@ Functions for handling CFS Session Events
 import json
 import logging
 import os
+import time
 import threading
 import uuid
 
@@ -37,7 +38,7 @@ import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.operator.cfs.options import options
 from cray.cfs.operator.cfs.configurations import get_configuration
 from cray.cfs.operator.events.job_events import CFSJobMonitor
-from cray.cfs.operator.kafka_utils import ConsumerWrapper
+from cray.cfs.operator.kafka_utils import KafkaWrapper
 
 LOGGER = logging.getLogger('cray.cfs.operator.events.session_events')
 DEFAULT_ANSIBLE_CONFIG = 'cfs-default-ansible-cfg'
@@ -91,9 +92,9 @@ class CFSSessionController:
         threading.Thread(target=self._run).start()
 
     def _run(self):  # pragma: no cover
-        kafka = ConsumerWrapper('cfs-session-events',
-                                group_id='cfs-operator',
-                                enable_auto_commit=False)
+        kafka = KafkaWrapper('cfs-session-events',
+                             group_id='cfs-operator',
+                             enable_auto_commit=False)
         while True:
             try:
                 for event in kafka.consumer:
@@ -115,9 +116,10 @@ class CFSSessionController:
                 self._handle_deleted(event_data)
             else:
                 LOGGER.warning('Invalid event type detected: {}'.format(event))
-            kafka.consumer.commit()
         except Exception as e:
             LOGGER.error("EVENT: Exception while handling cfs-operator event: {}".format(e))
+            self._send_retry(event, kafka)
+        kafka.consumer.commit()
 
     def _handle_added(self, event_data):
         job_id = 'cfs-' + str(uuid.uuid4())
@@ -132,6 +134,24 @@ class CFSSessionController:
         job_id = event_data.get('status', {}).get('session', {}).get('job')
         if job_id:
             self._delete_job(session_name, job_id)
+
+    def _send_retry(self, event, kafka):
+        attempt_count = 0
+        duration = 0
+        if 'attempt_count' in event:
+            attempt_count = event['attempt_count'] + 1
+        if 'attempt_start' in event:
+            duration = time.time() - event['attempt_start']
+        else:
+            event['attempt_start'] = time.time()
+        if attempt_count > 10 and duration > (60 * 10):  # 10 minutes
+            LOGGER.warning('Unable to handle event in allotted retries.'
+                           'Dropping event: {}'.format(event))
+        else:
+            event['attempt_count'] = attempt_count
+            kafka.produce(event)
+            # This small sleep helps prevent constant retries when this is the only event in queue
+            time.sleep(1)
 
     def _delete_job(self, session_name, job_id):
         """ Delete the Job """
