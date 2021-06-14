@@ -94,6 +94,19 @@ on Cray Shasta systems.
 * [Kafka](https://kafka.apache.org)
 * [Ansible](https://docs.ansible.com)
 
+## Build Helpers
+This repo uses some build helper scripts from the cms-meta-tools repo. See that repo for more details.
+
+## Dependency: cray-aee
+cfs-operator uses the cray-aee image built by the ansible-execution-environment repo.
+We specify which major and minor version of the image we want with the 
+[update_external_versions.conf](update_external_versions.conf) file.
+At build time the [runBuildPrep.sh](runBuildPrep.sh) script finds the
+latest version with that major and minor number.
+
+When creating a new release branch, be sure to update this file to specify the
+desired major and minor number of the image for the new release.
+
 ## Contributing
 
 Requests for Enhancement and Bugs can be filed in the [CASMCMS Jira project](https://connect.us.cray.com/jira/CreateIssue!default.jspa?selectedProjectKey=CASMCMS).
