@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-
-#
 # Copyright 2020-2021 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,11 +22,8 @@
 # (MIT License)
 #
 
-wget http://car.dev.cray.com/artifactory/csm/SCMS/noos/noarch/release/shasta-1.4/cms-team/manifest.txt
-aee_image_tag=$(cat manifest.txt | grep cray-aee | sed s/.*://g | tr -d '[:space:]')
-sed -i s/@aee_image_tag@/${aee_image_tag}/g kubernetes/cray-cfs-operator/values.yaml
-cfs_operator_image_tag=$(cat .version)
-sed -i s/@cfs_operator_image_tag@/${cfs_operator_image_tag}/g kubernetes/cray-cfs-operator/values.yaml
-rm manifest.txt
-./update_versions.sh
-exit $?
+./install_cms_meta_tools.sh || exit 1
+RC=0
+./cms_meta_tools/scripts/runBuildPrep.sh || RC=1
+rm -rf ./cms_meta_tools
+exit $RC
