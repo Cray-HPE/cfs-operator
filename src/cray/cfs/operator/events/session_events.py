@@ -322,8 +322,7 @@ class CFSSessionController:
             repos.append(
                 ('hosts', additional_inventory['cloneUrl'], additional_inventory['commit'])
             )
-        elif options.additional_inventory_url:
-            repos.append(('hosts', options.additional_inventory_url, 'master'))
+
         for i, clone_url, commit in repos:
             directory = SHARED_DIRECTORY + '/layer' + i
             if i == 'hosts':
@@ -579,6 +578,12 @@ class CFSSessionController:
         self._set_volumes(ansible_config)
 
         # Git clone containers
+        if session_data['target']['definition'] == "image":
+            # Disable additional inventory for image customization
+            additional_inventory = None
+        elif options.additional_inventory_url and not additional_inventory:
+            additional_inventory = {'cloneUrl': options.additional_inventory_url,
+                                    'commit': 'master'}
         clone_containers = self._get_clone_containers(configuration, additional_inventory)
 
         # Inventory container
