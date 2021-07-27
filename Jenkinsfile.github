@@ -17,70 +17,72 @@ pipeline {
     }
 
     stages {
-        stage("Pre-Prepare") {
+        stage("Set Versions") {
             steps {
                 script {
+                    // Get version from .version
                     def ver = sh(returnStdout: true, script: "head -1 .version").trim()
                     echo "Base version is ${ver}"
-                    def dockerver = getDockerBuildVersion(isStable: env.IS_STABLE).trim()
+                
+                    // Generate docker version string
+                    def dockerver = getDockerBuildVersion(isStable: env.IS_STABLE)
                     echo "Docker version is ${dockerver}"
-                    sh(script: """
-                            #!/usr/bin/env bash
-                            set -x
-                            set -e
-                            echo "${dockerver}" > .docker_version
-                        """)
-                    def chartver = getChartVersion(version: dockerver).trim()
+                
+                    // Write docker version string to .docker_version
+                    writeFile(file: ".docker_version", text: dockerver)
+                
+                    // Generate chart version string
+                    def chartver = dockerver.replaceAll("_", "+")
                     echo "Chart version is ${chartver}"
-                    sh(script: """
-                            #!/usr/bin/env bash
-                            set -x
-                            set -e
-                            echo "${chartver}" > .chart_version
-                            ./runBuildPrep.sh
-                        """)
+                
+                    // Write chart version to .chart_version
+                    writeFile(file: ".chart_version", text: chartver)
                 }
             }
         }
 
-        stage("Lint") {
-            environment {
-                VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
-                CHART_VERSION = sh(returnStdout: true, script: "head -1 .chart_version").trim()
-                DOCKER_ARGS = getDockerBuildArgs(name: env.NAME, description: env.DESCRIPTION, version: env.VERSION).trim()
-                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE).trim()
+        stage("runBuildPrep") {
+            steps {
+                sh "make runbuildprep"
             }
-            
+        }
+
+
+        stage("Lint") {
             steps {
                 sh "make lint"
             }
         }
-
-        stage("Prepare") {
+        
+        stage("Add RPM Metadata") {
             environment {
-                VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
-                CHART_VERSION = sh(returnStdout: true, script: "head -1 .chart_version").trim()
-                DOCKER_ARGS = getDockerBuildArgs(name: env.NAME, description: env.DESCRIPTION, version: env.VERSION).trim()
-                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE).trim()
+                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
             }
             
             steps {
                 echo "RPM build metadata is ${env.BUILD_METADATA}"
                 runLibraryScript("addRpmMetaData.sh", "")
+            }
+        }
+
+        stage("Prepare") {
+            environment {
+                RPM_VERSION = sh(returnStdout: true, script: "head -1 .version").trim()
+            }
+            
+            steps {
                 sh "make prepare"
             }
         }
 
-        stage("Build") {
-            environment {
-                VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
-                CHART_VERSION = sh(returnStdout: true, script: "head -1 .chart_version").trim()
-                DOCKER_ARGS = getDockerBuildArgs(name: env.NAME, description: env.DESCRIPTION, version: env.VERSION).trim()
-                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE).trim()
-            }
-            
+        stage("Build") {            
             parallel {
                 stage('Image') {
+                    environment {
+                        DOCKER_VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
+                        DOCKER_ARGS = getDockerBuildArgs(name: env.NAME, description: env.DESCRIPTION, version: env.DOCKER_VERSION)
+                    }
+
                     steps {
                         echo "Docker args are ${env.DOCKER_ARGS}"
                         sh "make image"
@@ -88,12 +90,21 @@ pipeline {
                 }
 
                 stage('Chart') {
+                    environment {
+                        DOCKER_VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
+                        CHART_VERSION = sh(returnStdout: true, script: "head -1 .chart_version").trim()
+                    }
+
                     steps {
                         sh "make chart"
                     }
                 }
 
                 stage('Rpm') {
+                    environment {
+                        RPM_VERSION = sh(returnStdout: true, script: "head -1 .version").trim()
+                    }
+
                     steps {
                         sh "make rpm"
                     }
@@ -103,19 +114,14 @@ pipeline {
 
         stage('Publish ') {
             environment {
-                VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
-                CHART_VERSION = sh(returnStdout: true, script: "head -1 .chart_version").trim()
-                DOCKER_ARGS = getDockerBuildArgs(name: env.NAME, description: env.DESCRIPTION, version: env.VERSION).trim()
-                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE).trim()
+                DOCKER_VERSION = sh(returnStdout: true, script: "head -1 .docker_version").trim()
             }
 
             steps {
-                script {
-                    publishCsmDockerImage(image: env.NAME, tag: env.VERSION, isStable: env.IS_STABLE)
-                    publishCsmHelmCharts(component: env.NAME, chartsPath: "${WORKSPACE}/kubernetes/.packaged", isStable: env.IS_STABLE)
-                    publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/RPMS/x86_64/*.rpm", arch: "x86_64", isStable: env.IS_STABLE)
-                    publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/SRPMS/*.rpm", arch: "src", isStable: env.IS_STABLE)
-                }
+                publishCsmDockerImage(image: env.NAME, tag: env.DOCKER_VERSION, isStable: env.IS_STABLE)
+                publishCsmHelmCharts(component: env.NAME, chartsPath: "${WORKSPACE}/kubernetes/.packaged", isStable: env.IS_STABLE)
+                publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/RPMS/x86_64/*.rpm", arch: "x86_64", isStable: env.IS_STABLE)
+                publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/SRPMS/*.rpm", arch: "src", isStable: env.IS_STABLE)
             }
         }
     }
