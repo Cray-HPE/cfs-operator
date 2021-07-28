@@ -8,7 +8,7 @@ keywords:
   - cfs
   - cray-cfs-operator
 sources:
-  - "https://stash.us.cray.com/projects/SCMS/repos/cfs-operator/browse"
+  - "https://github.com/Cray-HPE/cfs-operator"
 maintainers:
   - name: rbak
     email: rbak@cray.com
