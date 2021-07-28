@@ -36,7 +36,7 @@ setup(
     description="Cray Configuration Framework Service",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://stash.us.cray.com/projects/SCMS/repos/cfs-operator/browse",
+    url="https://github.com/Cray-HPE/cfs-operator",
     packages=find_namespace_packages(
         include=(
             'cray.cfs.inventory',
