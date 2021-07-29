@@ -41,19 +41,26 @@ pipeline {
             }
         }
 
+        stage("Clone cms_meta_tools repo") {
+            steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'jenkins-algol60-cray-hpe-github-integration')]) {
+                    sh "make clone_cms_meta_tools"
+                }
+            }
+        }
+
         stage("runBuildPrep") {
             steps {
                 sh "make runbuildprep"
             }
         }
 
-
         stage("Lint") {
             steps {
                 sh "make lint"
             }
         }
-        
+
         stage("Add RPM Metadata") {
             environment {
                 BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
