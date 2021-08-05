@@ -14,6 +14,7 @@ pipeline {
         NAME = "cray-cfs-operator"
         DESCRIPTION = "Cray Management System - Configuration Framework Operator"
         IS_STABLE = getBuildIsStable()
+        BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
     }
 
     stages {
@@ -38,14 +39,14 @@ pipeline {
                     // Generate docker version string
                     def dockerver = getDockerBuildVersion(isStable: env.IS_STABLE)
                     echo "Docker version is ${dockerver}"
-                
+
                     // Write docker version string to .docker_version
                     writeFile(file: ".docker_version", text: dockerver)
-                
+
                     // Generate chart version string
                     def chartver = dockerver.replaceAll("_", "+")
                     echo "Chart version is ${chartver}"
-                
+
                     // Write chart version to .chart_version
                     writeFile(file: ".chart_version", text: chartver)
                 }
@@ -65,10 +66,6 @@ pipeline {
         }
 
         stage("Add RPM Metadata") {
-            environment {
-                BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
-            }
-            
             steps {
                 echo "RPM build metadata is ${env.BUILD_METADATA}"
                 runLibraryScript("addRpmMetaData.sh", "")
@@ -81,7 +78,7 @@ pipeline {
             }
         }
 
-        stage("Build") {            
+        stage("Build") {
             parallel {
                 stage('Image') {
                     environment {
