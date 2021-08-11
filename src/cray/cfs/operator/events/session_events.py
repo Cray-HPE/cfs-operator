@@ -495,6 +495,10 @@ class CFSSessionController:
                     client.V1EnvVar(
                         name='ANSIBLE_ROLES_PATH',
                         value=roles_path
+                    ),
+                    client.V1EnvVar(
+                        name='INVENTORY_TYPE',
+                        value=session_data['target']['definition']
                     )
                 ],  # env
                 volume_mounts=[
