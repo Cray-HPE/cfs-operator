@@ -92,6 +92,7 @@ def main():
     except Exception as err:
         LOGGER.error("An unknown exception occurred: {}".format(err))
         raise
+    return 0
 
 
 if __name__ == "__main__":
