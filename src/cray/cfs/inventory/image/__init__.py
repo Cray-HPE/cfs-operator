@@ -47,6 +47,10 @@ from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
 
 LOGGER = logging.getLogger('cray.cfs.inventory.image')
 
+# Supress stack traces while waiting for ssh to be avaiable
+# Paramiko also raises these errors which we catch and log in a clearer way
+logging.getLogger("paramiko").setLevel(logging.CRITICAL)
+
 try:
     config.load_incluster_config()
 except ConfigException:  # pragma: no cover
@@ -317,6 +321,11 @@ class ImageRootInventory(CFSInventoryBase):
         start_time = datetime.now()
         LOGGER.info("Checking ssh availability")
         while True:
+            elapsed = (datetime.now() - start_time).seconds
+            LOGGER.info(
+                "Waiting for SSH to be available at %s:%s. Elapsed time=%ss", host,
+                port, elapsed
+            )
             time.sleep(2)
             try:
                 client.connect(host, port=int(port), password="", timeout=poll)
@@ -324,15 +333,11 @@ class ImageRootInventory(CFSInventoryBase):
                 # SSH is up even though we cannot authenticate
                 client.close()
                 return
-            except (socket.timeout, SSHException):
-                elapsed = (datetime.now() - start_time).seconds
-                LOGGER.info(
-                    "Waiting for SSH to be available at %s:%s. Elapsed time=%ss", host,
-                    port, elapsed
-                )
+            except (socket.timeout, SSHException) as e:
+                LOGGER.info("Error while waiting for SSH to be available: {}. Retrying..".format(e))
                 continue
             except Exception as e:
-                raise CFSInventoryError("Error connecting to the IMS container", e)
+                raise CFSInventoryError("Unexpected error connecting to the IMS container", e)
 
             client.close()
             return
