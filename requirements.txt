@@ -1,6 +1,5 @@
 --index-url https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
---extra-index-url http://dst.us.cray.com/piprepo/simple
---trusted-host dst.us.cray.com
+--trusted-host arti.dev.cray.com
 -c constraints.txt
 dictdiffer
 kubernetes
