@@ -19,13 +19,15 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 # (MIT License)
-ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.13.2
+ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.13
 FROM ${BASE_CONTAINER} as base
 ARG PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 WORKDIR /app
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
 RUN apk add --upgrade --no-cache apk-tools busybox && \
-    apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash
+	apk update && \
+    apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash && \
+    apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
 RUN PIP_INDEX_URL=${PIP_INDEX_URL} \
     pip3 install --no-cache-dir -U pip && \
