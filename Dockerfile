@@ -59,4 +59,5 @@ CMD ["nox", "--nocolor", "-s", "lint"]
 # Main application - CFS Kubernetes Operator
 FROM base as application
 RUN mkdir -p /inventory
+USER nobody:nobody
 ENTRYPOINT [ "python3", "-m", "cray.cfs.operator" ]
