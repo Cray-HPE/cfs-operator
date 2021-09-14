@@ -1,9 +1,9 @@
 # Cray Configuration Framework Service Operator
 
 A Kubernetes for managing Ansible Execution Environments through the
-[Cray Configuration Framework Service](https://stash.us.cray.com/projects/SCMS/repos/config-framework-service/browse).
+[Cray Configuration Framework Service](https://github.com/Cray-HPE/config-framework-service).
 A Config Framework Sessions manages the setup, launch, and teardown of
-[Ansible Execution Environments](https://stash.us.cray.com/projects/SCMS/repos/ansible-execution-environment/browse)
+[Ansible Execution Environments](https://github.com/Cray-HPE/ansible-execution-environment)
 (AEE) and provides status information from the AEE runs.
 
 Overall architecture of Shasta Configuration Management can be found in its
