@@ -618,6 +618,7 @@ class CFSSessionController:
                             'cfsversion': 'v2',
                             'app.kubernetes.io/name': 'cray-cfs-aee',
                             'aee': session_data['name'],
+                            'configuration': session_data.get('configuration', {}).get('name', '')
                         },
                     ),  # V1ObjectMeta
                     spec=client.V1PodSpec(
