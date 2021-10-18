@@ -1,6 +1,6 @@
 # Cray Configuration Framework Service Operator
 
-A Kubernetes for managing Ansible Execution Environments through the
+A Kubernetes deployment for managing Ansible Execution Environments through the
 [Cray Configuration Framework Service](https://github.com/Cray-HPE/config-framework-service).
 A Config Framework Sessions manages the setup, launch, and teardown of
 [Ansible Execution Environments](https://github.com/Cray-HPE/ansible-execution-environment)
