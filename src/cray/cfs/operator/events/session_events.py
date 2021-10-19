@@ -331,7 +331,10 @@ class CFSSessionController:
             split_url = clone_url.split('/')
             git_credentials_helper = 'git config --global credential.helper store'
             git_credentials_setup = 'echo "{}" > ~/.git-credentials'.format(
-                ''.join([split_url[0], '//${VCS_USER}:${VCS_PASSWORD}@', split_url[2]])
+                ''.join([
+                    split_url[0],
+                    '//${VCS_USER//[$\'\t\r\n\']}:${VCS_PASSWORD//[$\'\t\r\n\']}@',
+                    split_url[2]])
             )
 
             git_command = 'RETRIES={retries}; '\
