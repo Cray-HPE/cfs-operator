@@ -6,9 +6,6 @@ A Config Framework Sessions manages the setup, launch, and teardown of
 [Ansible Execution Environments](https://github.com/Cray-HPE/ansible-execution-environment)
 (AEE) and provides status information from the AEE runs.
 
-Overall architecture of Shasta Configuration Management can be found in its
-[design document](https://connect.us.cray.com/confluence/x/ZKmfBw).
-
 ## Getting Started
 
 ### Prerequisites
