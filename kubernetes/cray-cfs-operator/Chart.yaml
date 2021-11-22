@@ -1,18 +1,30 @@
-apiVersion: v1
-description: "Kubernetes resources for cfs-operator"
-name: "cray-cfs-operator"
-home: "scms/cfs-operator"
-version: @CHART_VERSION@
-appVersion: @DOCKER_VERSION@
+apiVersion: v2
+name: cray-cfs-operator
+version: 0.0.0-chart
+description: Kubernetes resources for cfs-operator
 keywords:
-  - cfs
-  - cray-cfs-operator
+- cfs
+- cray-cfs-operator
+home: https://github.com/Cray-HPE/cfs-operator
 sources:
-  - "https://github.com/Cray-HPE/cfs-operator"
+- https://github.com/Cray-HPE/cfs-operator
+- https://github.com/Cray-HPE/ansible-execution-environment
+dependencies:
+- name: cray-service
+  version: ^7.0.0
+  repository: https://artifactory.algol60.net/artifactory/csm-helm-charts/
 maintainers:
-  - name: rbak
-    email: rbak@cray.com
-  - name: rkleinman
-    email: rkleinman@cray.com
-  - name: jasons
-    email: jasons@cray.com
+- name: rbak-hpe
+  email: ryan.bak@hpe.com
+- name: rkleinman-hpe
+  email: randy.kleinman@hpe.com
+appVersion: 0.0.0-image
+annotations:
+  artifacthub.io/images: |
+    - name: cray-cfs-operator
+      image: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator:0.0.0-image
+    - name: cray-aee
+      image: artifactory.algol60.net/csm-docker/stable/cray-aee:0.0.0-aee
+    - name: alpine/git
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/alpine/git:1.0.15
+  artifacthub.io/license: MIT

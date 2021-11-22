@@ -8,13 +8,13 @@
 #   pullPolicy: "" (default = "IfNotPresent")
 
 util_image:
-  repository: alpine/git
+  repository: artifactory.algol60.net/csm-docker/stable/docker.io/alpine/git
   version: 1.0.15
 ims_image:
-  repository: cray/cray-cfs-operator
+  repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
 aee_image:
-  repository: cray/cray-aee
-  version: IMAGE_CRAY_AEE_TAG
+  repository: artifactory.algol60.net/csm-docker/stable/cray-aee
+  version: 0.0.0-aee
 
 service_name: cray-cfs-operator
 cray-service:
@@ -28,7 +28,7 @@ cray-service:
     cray-cfs-operator:
       name: cray-cfs-operator
       image:
-        repository: cray/cray-cfs-operator
+        repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
       env:
       - name: CFS_OPERATOR_LOG_LEVEL
         value: "INFO"
@@ -59,7 +59,7 @@ cray-service:
             key: cray_cfs_ims_image
       - name: CRAY_CFS_SERVICE_ACCOUNT
         value: "cray-cfs"
-      - name : VCS_USER_CREDENTIALS
+      - name: VCS_USER_CREDENTIALS
         value: "vcs-user-credentials"
       resources:
         requests:
