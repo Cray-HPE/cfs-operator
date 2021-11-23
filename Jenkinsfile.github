@@ -1,5 +1,5 @@
 @Library('cms-meta-tools') _
-@Library('csm-shared-library') __
+@Library('csm-shared-library@CASMTRIAGE-2708') __
 
 pipeline {
     agent {
