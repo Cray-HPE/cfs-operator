@@ -26,5 +26,5 @@ annotations:
     - name: cray-aee
       image: artifactory.algol60.net/csm-docker/stable/cray-aee:0.0.0-aee
     - name: alpine/git
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/alpine/git:1.0.15
+      image: alpine/git:v2.32.0
   artifacthub.io/license: MIT
