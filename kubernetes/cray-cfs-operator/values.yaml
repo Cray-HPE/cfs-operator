@@ -8,8 +8,8 @@
 #   pullPolicy: "" (default = "IfNotPresent")
 
 util_image:
-  repository: artifactory.algol60.net/csm-docker/stable/docker.io/alpine/git
-  version: 1.0.15
+  repository: alpine/git
+  version: v2.32.0
 ims_image:
   repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
 aee_image:
