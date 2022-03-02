@@ -1,4 +1,7 @@
-# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
+#
+# MIT License
+#
+# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -12,19 +15,19 @@
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-#
-# (MIT License)
+
 """
 Functions for handling CFS Session Events
 """
 import json
 import logging
 import os
+import shlex
 import time
 import threading
 import uuid
@@ -62,24 +65,6 @@ wait_for_envoy_boilerplate = 'until curl --head localhost:15000; ' \
                              'sleep 3; ' \
                              'done; ' \
                              'echo Sidecar available'
-
-# Boilerplate code to copy the certs created by cfs-trust/vault for use with live nodes
-bootstrap_cfs_keys_boilerplate = 'mkdir -p /root/.ssh && ' \
-                                 'until [ -f {0}/ssh/id_ecdsa ]; do sleep 1; done; ' \
-                                 'cp -a {0}/ssh/* /root/.ssh/ && ' \
-                                 'chmod 600 /root/.ssh/id_ecdsa && ' \
-                                 'echo CFS trust keys migrated to /root/.ssh'.format(
-                                     SHARED_DIRECTORY)
-
-# Boilerplate code to copy the certs created by cfs-trust/vault for use with image customization
-bootstrap_cfs_keys_boilerplate_image = 'mkdir -p /root/.ssh && ' \
-                                       'until [ -f {0}/ssh/id_ecdsa ]; do sleep 1; done; ' \
-                                       'until [ -f {0}/ssh/id_image ]; do sleep 1; done; ' \
-                                       'cp -a {0}/ssh/* /root/.ssh/ && ' \
-                                       'chmod 600 /root/.ssh/id_ecdsa && ' \
-                                       'chmod 600 /root/.ssh/id_image && ' \
-                                       'echo CFS trust keys migrated to /root/.ssh'.format(
-                                           SHARED_DIRECTORY)
 
 
 class CFSSessionController:
@@ -395,19 +380,16 @@ class CFSSessionController:
         create_ssh_keys_cmd = 'cp /secret-keys/* {0}/ssh/ && ' \
                               'cp /secret-certs/* {0}/ssh/ '.format(SHARED_DIRECTORY)
 
-        boostrap_keys = bootstrap_cfs_keys_boilerplate
         # For image customization, generate some keys for use with Ansible
         if session_data['target']['definition'] == "image":
             create_ssh_keys_cmd += ' && ssh-keygen -t ecdsa -N "" -f {}/ssh/id_image '.format(
                 SHARED_DIRECTORY)
-            boostrap_keys = bootstrap_cfs_keys_boilerplate_image
 
         copy_ansible_cfg_cmd = 'cp /tmp/ansible/ansible.cfg {}/ '.format(SHARED_DIRECTORY)
         run_inventory_cmd = 'python3 -m cray.cfs.inventory'
         command = [
             create_ssh_dir_cmd + ' && ' +
             create_ssh_keys_cmd + ' && ' +
-            boostrap_keys + ' && ' +
             copy_ansible_cfg_cmd + ' && ' +
             wait_for_envoy_boilerplate + ' && ' +
             run_inventory_cmd
@@ -441,6 +423,9 @@ class CFSSessionController:
         ansible_containers = []
         ansible_config = options.default_ansible_config
         ansible_args = []
+        disable_state_recording=False
+        if session_data['target']['definition'] == 'image':
+            disable_state_recording=True
         if 'ansible' in session_data:
             ansible_spec = session_data['ansible']
             ansible_config = ansible_spec.get('config', ansible_config)
@@ -457,6 +442,11 @@ class CFSSessionController:
             if limit:
                 ansible_args.append('--limit')
                 ansible_args.append(limit)
+
+            ansible_passthrough = ansible_spec.get('passthrough', '')
+            if ansible_passthrough:
+                ansible_args.extend(shlex.split(ansible_passthrough, posix=False))
+                disable_state_recording=True
 
         previous = ''
         for i, layer in configuration:
@@ -501,6 +491,10 @@ class CFSSessionController:
                     client.V1EnvVar(
                         name='INVENTORY_TYPE',
                         value=session_data['target']['definition']
+                    ),
+                    client.V1EnvVar(
+                        name='DISABLE_STATE_RECORDING',
+                        value=str(disable_state_recording)
                     )
                 ],  # env
                 volume_mounts=[
@@ -519,7 +513,6 @@ class CFSSessionController:
         teardown container to wrap the IMS image back up and put a bow on it.
         """
         teardown_args = [
-            bootstrap_cfs_keys_boilerplate + ' && ' +
             wait_for_envoy_boilerplate + ' && ' +
             ' python3 -m cray.cfs.teardown'
         ]

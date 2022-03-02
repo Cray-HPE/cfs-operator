@@ -2,51 +2,9 @@
 
 A Kubernetes deployment for managing Ansible Execution Environments through the
 [Cray Configuration Framework Service](https://github.com/Cray-HPE/config-framework-service).
-A Config Framework Sessions manages the setup, launch, and teardown of
+A Config Framework Session manages the setup, launch, and teardown of
 [Ansible Execution Environments](https://github.com/Cray-HPE/ansible-execution-environment)
 (AEE) and provides status information from the AEE runs.
-
-## Getting Started
-
-### Prerequisites
-
-1. A Python 3.x-based virtual environment,
-2. The Python requirements,
-3. A Kubernetes cluster to connect to (virtual or physical) to run the operator.
-   This is not necessary for development or running the tests.
-4. Docker (for building the image locally)
-
-```bash
-$ python3.6 -m venv ~/Documents/venv/cfs-operator
-$ source ~/Documents/venv/cfs-operator/bin/activate
-(cfs-operator) $ which python
-/Users/jdeveloper/Documents/venv/cfs-operator/bin/python
-```
-
-Once in the `cfs-operator` virtual environment, install the project requirements:
-
-```bash
-(cfs-operator) $ pip install -r requirements-dev.txt
-...
-(cfs-operator) $ pip install -r requirements.txt
-...
-```
-
-__NOTE__: If you receive errors about `gcc` failing due to OpenSSL issues on a
-Mac, export the following FLAGS and retry:
-
-```bash
-(cfs-operator) $ CPPFLAGS=-I/usr/local/opt/openssl/include
-(cfs-operator) $ LDFLAGS=-L/usr/local/opt/openssl/lib
-```
-
-To run the operator in a Kubernetes cluster, download the Kube config file from
-the cluster (located in `/etc/kubernetes/admin.conf` on Cray Shasta systems).
-
-```bash
-(cfs-operator) $ mkdir ~/.kube
-(cfs-operator) $ ssh root@<sms-1>:/etc/kubernetes/admin.conf ~/.kube/config
-```
 
 ## Testing & Code Quality
 
@@ -133,10 +91,8 @@ When making a new release branch:
 
 ## Contributing
 
-Requests for Enhancement and Bugs can be filed in the [CASMCMS Jira project](https://connect.us.cray.com/jira/CreateIssue!default.jspa?selectedProjectKey=CASMCMS).
-
-Members of the CASMCMS team should provide a pull request to master. External
-Crayons should fork this repository and provide a pull request to the current release branch.
+Members of the CASMCMS team should provide a pull request to master and/or a release branch.
+Others should fork this repository and provide a pull request to the current release branch.
 
 ## Authors
 

@@ -8,9 +8,9 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Values.service_name }}
 data:
-  cray_cfs_util_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.util_image.repository }}:{{ .Values.util_image.version }}"
-  cray_cfs_aee_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.aee_image.repository }}:{{ .Values.aee_image.version }}"
-  cray_cfs_ims_image: "{{ $baseChartValues.imagesHost }}/{{ .Values.ims_image.repository }}:{{ .Values.ims_image.version | default $baseChartValues.global.appVersion }}"
+  cray_cfs_util_image: "{{ .Values.util_image.repository }}:{{ .Values.util_image.version }}"
+  cray_cfs_aee_image: "{{ .Values.aee_image.repository }}:{{ .Values.aee_image.version }}"
+  cray_cfs_ims_image: "{{ .Values.ims_image.repository }}:{{ .Values.ims_image.version | default $baseChartValues.global.appVersion }}"
 
 ---
 apiVersion: v1
@@ -46,4 +46,3 @@ data:
     [ssh_connection]
     pipelining = True
     ssh_args = -o ServerAliveInterval=30 -o ControlMaster=auto -o ControlPersist=60s
-
