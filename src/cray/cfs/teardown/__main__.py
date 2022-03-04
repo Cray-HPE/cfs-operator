@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
-# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
+#
+# MIT License
+#
+# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -129,7 +150,7 @@ def _finish_the_job(job_id: str, cfs_name: str) -> None:
         if ssh_container['name'] == cfs_name:
             ssh_host = ssh_container['connection_info']['cluster.local']['host']
             ssh_port = ssh_container['connection_info']['cluster.local']['port']
-            key = paramiko.ecdsakey.ECDSAKey.from_private_key_file('/root/.ssh/id_image')
+            key = paramiko.ecdsakey.ECDSAKey.from_private_key_file('/inventory/ssh/id_image')
             pclient = paramiko.SSHClient()
             for x in range(20):
                 try:
@@ -283,7 +304,7 @@ def main() -> None:  # noqa: C901
 
     version = get_distribution('cray-cfs').version
     LOGGER.info('Starting CFS IMS Teardown version=%s, namespace=%s', version, cfs_namespace)
-    LOGGER.info("Waiting for `ansible` container to finish.")
+    LOGGER.info("Waiting for `ansible` containers to finish.")
     if 'LAYER_PREVIOUS' in os.environ:
         v2 = True
         ansible_status = wait_for_aee_finish_v2(os.environ['LAYER_PREVIOUS'])
