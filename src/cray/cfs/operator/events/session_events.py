@@ -391,6 +391,7 @@ class CFSSessionController:
         # For live nodes, use the signed keys from vault with a cert generated
         # by the CFS trust mechanisms
         create_ssh_keys_cmd = 'cp /secret-keys/* {0}/ssh/ && ' \
+                              'chmod 600 {0}/ssh/id_ecdsa && ' \
                               'cp /secret-certs/* {0}/ssh/ '.format(SHARED_DIRECTORY)
 
         boostrap_keys = bootstrap_cfs_keys_boilerplate
