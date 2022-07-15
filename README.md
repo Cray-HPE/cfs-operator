@@ -99,6 +99,11 @@ Others should fork this repository and provide a pull request to the current rel
 * __Randy Kleinman__ - Q1 2019 - _Initial Work_ - rkleinman@cray.com
 * (Add your name here for praise or blame later)
 
+## Changelog
+
+See the [CHANGELOG](CHANGELOG.md) for changes. This file uses the [Keep A Changelog](https://keepachangelog.com)
+format.
+
 ## Copyright and License
 This project is copyrighted by Hewlett Packard Enterprise Development LP and is under the MIT
 license. See the [LICENSE](LICENSE) file for details.
