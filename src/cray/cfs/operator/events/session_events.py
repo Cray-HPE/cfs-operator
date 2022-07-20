@@ -77,11 +77,11 @@ class CFSSessionController:
         threading.Thread(target=self._run).start()
 
     def _run(self):  # pragma: no cover
-        kafka = KafkaWrapper('cfs-session-events',
-                             group_id='cfs-operator',
-                             enable_auto_commit=False)
         while True:
             try:
+                kafka = KafkaWrapper('cfs-session-events',
+                                     group_id='cfs-operator',
+                                     enable_auto_commit=False)
                 for event in kafka.consumer:
                     self._handle_event(event.value, kafka)
             except Exception as e:
