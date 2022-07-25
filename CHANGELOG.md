@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.15.0] - 7/19/22
 ### Changed
+- Migrated over to arti internal build references.
 - Convert to gitflow/gitversion.
 - Fixed Kafka retries
 
