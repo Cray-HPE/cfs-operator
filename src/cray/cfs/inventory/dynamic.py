@@ -122,7 +122,7 @@ class DynamicInventory(CFSInventoryBase):
         return {}
 
     def _get_data(self, endpoint):
-        url = 'http://{}/hsm/v1/{}'.format(self.hsm_host, endpoint)
+        url = 'http://{}/hsm/v2/{}'.format(self.hsm_host, endpoint)
         LOGGER.debug('Querying %s for inventory data.', url)
         r = self.session.get(url, verify=self.ca_cert)
         r.raise_for_status()

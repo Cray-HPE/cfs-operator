@@ -77,11 +77,11 @@ class CFSSessionController:
         threading.Thread(target=self._run).start()
 
     def _run(self):  # pragma: no cover
-        kafka = KafkaWrapper('cfs-session-events',
-                             group_id='cfs-operator',
-                             enable_auto_commit=False)
         while True:
             try:
+                kafka = KafkaWrapper('cfs-session-events',
+                                     group_id='cfs-operator',
+                                     enable_auto_commit=False)
                 for event in kafka.consumer:
                     self._handle_event(event.value, kafka)
             except Exception as e:
@@ -378,6 +378,7 @@ class CFSSessionController:
         # For live nodes, use the signed keys from vault with a cert generated
         # by the CFS trust mechanisms
         create_ssh_keys_cmd = 'cp /secret-keys/* {0}/ssh/ && ' \
+                              'chmod 600 {0}/ssh/id_ecdsa && ' \
                               'cp /secret-certs/* {0}/ssh/ '.format(SHARED_DIRECTORY)
 
         # For image customization, generate some keys for use with Ansible
