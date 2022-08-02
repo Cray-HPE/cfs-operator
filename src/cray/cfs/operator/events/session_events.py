@@ -412,6 +412,9 @@ class CFSSessionController:
                 self._job_env['SSL_CAINFO']
             ],  # env
             command=['/bin/bash', '-c'],
+            security_context = client.V1SecurityContext(
+                run_as_user = 0
+            ),
             args=command,
         )  # V1Container
 
@@ -533,6 +536,9 @@ class CFSSessionController:
                 )
             ],  # env
             command=['/bin/bash', '-c'],
+            security_context = client.V1SecurityContext(
+                run_as_user = 0
+            ),
             args=teardown_args,
         )  # V1Container
 
