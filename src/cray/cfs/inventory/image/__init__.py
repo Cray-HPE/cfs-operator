@@ -117,7 +117,7 @@ class ImageRootInventory(CFSInventoryBase):
                     'job_id': job_id,
                     'image_id': image,
                 }
-                inventory[group]['hosts'][image_name] = {
+                inventory[group]['hosts'][image] = {
                     'ansible_host': host,
                     'ansible_port': port,
                     'cray_cfs_image': True,

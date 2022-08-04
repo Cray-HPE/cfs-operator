@@ -412,6 +412,9 @@ class CFSSessionController:
                 self._job_env['SSL_CAINFO']
             ],  # env
             command=['/bin/bash', '-c'],
+            security_context = client.V1SecurityContext(
+                run_as_user = 0
+            ),
             args=command,
         )  # V1Container
 
@@ -439,6 +442,8 @@ class CFSSessionController:
                 ansible_args.append(ansible_verbosity)
 
             limit = ansible_spec.get('limit', None)
+            if session_data['target']['definition'] == 'image' and not limit:
+                limit = ','.join([member for group in session_data['target']['groups'] for member in group['members']])
             if limit:
                 ansible_args.append('--limit')
                 ansible_args.append(limit)
@@ -533,6 +538,9 @@ class CFSSessionController:
                 )
             ],  # env
             command=['/bin/bash', '-c'],
+            security_context = client.V1SecurityContext(
+                run_as_user = 0
+            ),
             args=teardown_args,
         )  # V1Container
 
@@ -578,10 +586,7 @@ class CFSSessionController:
         self._set_volumes(ansible_config)
 
         # Git clone containers
-        if session_data['target']['definition'] == "image":
-            # Disable additional inventory for image customization
-            additional_inventory = None
-        elif options.additional_inventory_url and not additional_inventory:
+        if options.additional_inventory_url and not additional_inventory:
             additional_inventory = {'cloneUrl': options.additional_inventory_url,
                                     'commit': 'master'}
         clone_containers = self._get_clone_containers(configuration, additional_inventory)
