@@ -23,7 +23,6 @@
 #
 ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.15
 FROM ${BASE_CONTAINER} as base
-ARG PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 WORKDIR /app
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
 RUN apk add --upgrade --no-cache apk-tools busybox && \
@@ -31,8 +30,7 @@ RUN apk add --upgrade --no-cache apk-tools busybox && \
     apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
-RUN PIP_INDEX_URL=${PIP_INDEX_URL} \
-    pip3 install --no-cache-dir -U pip && \
+RUN pip3 install --no-cache-dir -U pip && \
     pip3 install --no-cache-dir -U wheel && \
     pip3 install --no-cache-dir -r requirements.txt
 COPY src/ /app/lib
@@ -41,7 +39,6 @@ RUN cd /app/lib && pip3 install --no-cache-dir .
 
 # Nox Environment
 FROM base as nox
-ARG PIP_INDEX_URL=https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 COPY requirements-dev.txt noxfile.py /app/
 RUN pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt
 

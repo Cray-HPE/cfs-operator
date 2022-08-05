@@ -1,4 +1,3 @@
---index-url https://arti.dev.cray.com:443/artifactory/api/pypi/pypi-remote/simple
 pytest
 pytest-cov
 mock
