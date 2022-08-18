@@ -47,6 +47,7 @@ cray-service:
   serviceAccountName: cray-cfs
   labels:
     app: cray-cfs-operator
+  priorityClassName: csm-high-priority-service
   containers:
     cray-cfs-operator:
       name: cray-cfs-operator
