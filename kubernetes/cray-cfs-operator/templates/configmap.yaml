@@ -50,7 +50,7 @@ data:
     # NOTE: cfs_aggregator must be included in the callback_whitelist to enable
     # CFS reporting for individual sessions.
     #
-    # WARNING: Changing some of these values may cause performance degredation.
+    # WARNING: Changing some of these values may cause performance degradation.
     [defaults]
     gathering             = smart
     forks                 = 500
