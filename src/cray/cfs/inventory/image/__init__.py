@@ -49,7 +49,7 @@ from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
 
 LOGGER = logging.getLogger('cray.cfs.inventory.image')
 
-# Supress stack traces while waiting for ssh to be avaiable
+# Suppress stack traces while waiting for ssh to be available
 # Paramiko also raises these errors which we catch and log in a clearer way
 logging.getLogger("paramiko").setLevel(logging.CRITICAL)
 
@@ -149,7 +149,7 @@ class ImageRootInventory(CFSInventoryBase):
         the established host.
 
         Returns a mapping of IMS UUIDs to (job id, image name, host, port) tuples
-        used for ssh connnections to the created ssh containers.
+        used for ssh connections to the created ssh containers.
         """
         key_uuid = ImageRootInventory._upload_public_key(self.cfs_name, self.cfs_namespace)
         ssh_containers = {}
