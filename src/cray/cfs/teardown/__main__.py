@@ -123,7 +123,7 @@ def _get_image_to_job() -> Mapping[str, str]:
     return image_to_job
 
 
-def _finish_the_job(job_id: str, cfs_name: str) -> None:
+def _finish_the_job(job_id: str, cfs_name: str, completion_flag: str = "complete") -> None:
     """
     Tell IMS to finish the job by touching the /tmp/complete file in the jail.
 
@@ -155,13 +155,13 @@ def _finish_the_job(job_id: str, cfs_name: str) -> None:
             for x in range(20):
                 try:
                     pclient.set_missing_host_key_policy(paramiko.WarningPolicy())
-                    LOGGER.info("Remotely touching complete file for %s:%s", ssh_host,
+                    LOGGER.info("Remotely touching %s file for %s:%s", completion_flag, ssh_host,
                                 str(ssh_port))
                     pclient.connect(
                         ssh_host, port=ssh_port, pkey=key, username='root',
                         password='',
                     )
-                    pclient.exec_command('touch /tmp/complete')
+                    pclient.exec_command('touch /tmp/{}'.format(completion_flag))
                     break
                 except Exception as e:
                     LOGGER.error(e)
@@ -186,7 +186,7 @@ def do_failed(image_id: str, job_id: str, cfs_name: str, queue) -> None:
         None
     """
     try:
-        _finish_the_job(job_id, cfs_name)
+        _finish_the_job(job_id, cfs_name, completion_flag="failed")
     except Exception as err:
         queue.put(
             ('error', image_id, job_id, err)

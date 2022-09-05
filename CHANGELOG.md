@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Updated dynamic inventory to log and drop invalid HSM group names
+- Image teardown now marks failed images correctly
 
 ### Fixed
 - Spelling corrections.
