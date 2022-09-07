@@ -70,7 +70,7 @@ import requests
 import yaml
 
 from cray.cfs.inventory.image import get_IMS_API
-from cray.cfs.logging import setup_logging
+from cray.cfs.logging import setup_logging, update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.utils import wait_for_aee_finish_v1, wait_for_aee_finish_v2
 
@@ -445,4 +445,5 @@ def main() -> None:  # noqa: C901
 
 if __name__ == '__main__':
     setup_logging()
+    update_logging(update_options=True)
     main()
