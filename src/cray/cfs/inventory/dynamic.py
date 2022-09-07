@@ -88,8 +88,8 @@ class DynamicInventory(CFSInventoryBase):
                 group_name = str(group['label'])
                 if not valid_group_name(group_name):
                     LOGGER.warning(
-                        'Encountered an invalid Ansible group name. \
-                         Ignoring HSM group {}'.format(group_name))
+                        'Encountered an invalid Ansible group name. Ignoring HSM group {}'.format(
+                            group_name))
                     continue
                 inventory[group_name] = hosts
             return inventory

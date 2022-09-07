@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated dynamic inventory to log and drop invalid HSM group names
 - Image teardown now marks failed images correctly
 - Log levels are now controlled by a CFS option
+- Ansible container limits/requests are now configurable
 
 ### Fixed
 - Spelling corrections.

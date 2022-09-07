@@ -53,7 +53,7 @@ def setup_logging(env_key='STARTING_LOG_LEVEL', default_level='INFO') -> None:
         LOGGER.warning('Log level %r is not valid. Falling back to INFO', bad_log_level)
 
 
-def _update_log_level(update_options=False) -> None:
+def update_logging(update_options=False) -> None:
     """ Updates the current logging level base on the value in the options database """
     try:
         if update_options:
