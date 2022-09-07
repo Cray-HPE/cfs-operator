@@ -334,7 +334,7 @@ class CFSSessionController:
                           'echo "Cloning successful"; '\
                           'cd {directory}; '\
                           'git checkout {commit}; '\
-                          'exit 0; '\
+                          'exit $?; '\
                           'fi; '\
                           'if [ $COUNT -gt $RETRIES ]; then '\
                           'echo "Cloning exceeded retry limit - Stopping"; '\

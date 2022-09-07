@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Spelling corrections.
+- Fixed the exit code when git checkout fails
 
 ## [1.16.1] - 8/4/22
 ### Fixed
