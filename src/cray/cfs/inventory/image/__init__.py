@@ -239,7 +239,7 @@ class ImageRootInventory(CFSInventoryBase):
         except requests.exceptions.HTTPError as err:
             raise CFSInventoryError(
                 'Unable to create an IMS customization job for IMS image=%r. '
-                'Reason: %s' % (ims_id, err)
+                'Reason: %s. See the IMS logs for more information.' % (ims_id, err)
             )
 
         # Wait for the SSH container to become available, put the resulting SSH
