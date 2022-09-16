@@ -55,7 +55,6 @@ class DynamicInventory(CFSInventoryBase):
         groups.update(self._get_components())
         LOGGER.info('Dynamic inventory found a total of %d groups', len(groups))
         LOGGER.debug('Dynamic inventory found the following groups: %s', ','.join(groups.keys()))
-
         inventory = {
             'all': {
                 'children': groups
@@ -83,7 +82,7 @@ class DynamicInventory(CFSInventoryBase):
             for group in data:
                 members = group['members']['ids']
                 hosts = {}
-                hosts['hosts'] = {str(member): {} for member in members}
+                hosts['hosts'] = {str(member): {'ansible_host': '%s.nmn' %(member)} for member in members}
                 inventory[str(group['label'])] = hosts
             return inventory
         except Exception as e:
@@ -97,7 +96,7 @@ class DynamicInventory(CFSInventoryBase):
             for group in data:
                 members = group['members']['ids']
                 hosts = {}
-                hosts['hosts'] = {str(member): {} for member in members}
+                hosts['hosts'] = {'ansible_host': '%s.nmn' %(member) for member in members}
                 inventory[str(group['name'])] = hosts
             return inventory
         except Exception as e:
@@ -112,10 +111,10 @@ class DynamicInventory(CFSInventoryBase):
                 role = ''
                 if 'Role' in component:
                     role = str(component['Role'])
-                    hosts[role][str(component['ID'])] = {}
+                    hosts[role][str(component['ID'])] = {'ansible_host': '%s.nmn' %(str(component['ID']))}
                 if 'SubRole' in component:
                     subrole = str(component['SubRole'])
-                    hosts[role + '_' + subrole][str(component['ID'])] = {}
+                    hosts[role + '_' + subrole][str(component['ID'])] = {'ansible_host': '%s.nmn' %(str(component['ID']))}
             return {group: {'hosts': host} for group, host in hosts.items()}
         except Exception as e:
             LOGGER.error('Encountered an unknown exception getting component data: {}'.format(e))
