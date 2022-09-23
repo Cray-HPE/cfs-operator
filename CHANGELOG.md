@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a new parameter for naming image customization results
 - Added a pointer to IMS logs when image inventory creation fails
+- Added cfs_image host group to image customization inventory
 
 ### Changed
 - Updated dynamic inventory to log and drop invalid HSM group names

@@ -62,6 +62,9 @@ _api_client = client.ApiClient()
 k8score = client.CoreV1Api(_api_client)
 
 
+IMAGE_HOST_GROUP = "cfs_image"
+
+
 def get_IMS_API() -> Tuple[str, str, requests.Session]:
     """
     Retrieve the IMS service host and port and a resilient/retry session object,
@@ -109,6 +112,8 @@ class ImageRootInventory(CFSInventoryBase):
         # Create an inventory file with the IMS images, their groups, and
         # connection information, leave a breadcrumb of image to job info too.
         inventory = {}
+        inventory[IMAGE_HOST_GROUP] = {}
+        inventory[IMAGE_HOST_GROUP]['hosts'] = {}
         self.image_to_job = {}
         for group, images in self.get_groups_members().items():
             inventory[group] = {}
@@ -119,11 +124,11 @@ class ImageRootInventory(CFSInventoryBase):
                     'job_id': job_id,
                     'image_id': image,
                 }
-                inventory[group]['hosts'][image] = {
+                inventory[group]['hosts'][image] = {}
+                inventory[IMAGE_HOST_GROUP]['hosts'][image] = {
                     'ansible_host': host,
                     'ansible_port': port,
                     'cray_cfs_image': True,
-                    # yuck, tested on SLE15 only
                     'ansible_python_interpreter': '/usr/bin/env python3',
                     'ansible_ssh_private_key_file': '/etc/ansible/ssh/id_image',
                 }
