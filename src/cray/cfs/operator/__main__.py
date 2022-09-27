@@ -37,6 +37,7 @@ from kubernetes import config, client
 from kubernetes.config.config_exception import ConfigException
 
 from .events import CFSSessionController
+from cray.cfs.logging import setup_logging, update_logging
 from cray.cfs.operator.cfs.options import options
 import cray.cfs.operator.cfs.sessions as sessions
 from cray.cfs.operator.liveness.timestamp import Timestamp
@@ -60,6 +61,7 @@ def session_cleanup():
         time.sleep(60 * 5)  # Run every 5 minutes
         try:
             options.update()
+            update_logging()
             ttl = options.session_ttl
             if ttl:
                 sessions.delete_sessions(status='complete', min_age=ttl)
@@ -99,18 +101,6 @@ def main(env):
     controller.run()
 
 
-def _init_logging():
-    # Format logs for stdout
-    log_format = "%(asctime)-15s - %(levelname)-7s - %(name)s - %(message)s"
-    requested_log_level = os.environ.get('CFS_OPERATOR_LOG_LEVEL', 'INFO')
-    log_level = logging.getLevelName(requested_log_level)
-
-    if type(log_level) != int:
-        LOGGER.warning('Log level %r is not valid. Falling back to INFO', requested_log_level)
-        log_level = logging.INFO
-    logging.basicConfig(level=log_level, format=log_format)
-
-
 def _init_env():
     # CFS Environment Variables
     cfs_environment = {k: v for k, v in os.environ.items() if 'CFS' in k}
@@ -139,7 +129,7 @@ def _wait_for_networking_setup():
 
 if __name__ == '__main__':
     Timestamp()  # Initialize our watch timestamp
-    _init_logging()
+    setup_logging()
     env = _init_env()
     _wait_for_networking_setup()
 

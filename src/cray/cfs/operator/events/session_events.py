@@ -334,7 +334,7 @@ class CFSSessionController:
                           'echo "Cloning successful"; '\
                           'cd {directory}; '\
                           'git checkout {commit}; '\
-                          'exit 0; '\
+                          'exit $?; '\
                           'fi; '\
                           'if [ $COUNT -gt $RETRIES ]; then '\
                           'echo "Cloning exceeded retry limit - Stopping"; '\
@@ -469,8 +469,8 @@ class CFSSessionController:
                 name='ansible-' + str(i),
                 image=self.env['CRAY_CFS_AEE_IMAGE'],
                 resources=client.V1ResourceRequirements(
-                    limits={'memory': '6Gi', 'cpu': '8'},
-                    requests={'memory': '4Gi', 'cpu': '500m'}
+                    limits=json.loads(self.env['CRAY_CFS_ANSIBLE_CONTAINER_LIMITS']),
+                    requests=json.loads(self.env['CRAY_CFS_ANSIBLE_CONTAINER_REQUESTS'])
                 ),
                 env=[
                     self._job_env['SESSION_NAME'],

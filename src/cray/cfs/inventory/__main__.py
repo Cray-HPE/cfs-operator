@@ -36,7 +36,7 @@ from cray.cfs.inventory.image import ImageRootInventory
 from cray.cfs.inventory.spec import ExplicitInventory
 from cray.cfs.inventory.repo import RepositoryInventory
 from cray.cfs.inventory.dynamic import DynamicInventory
-from cray.cfs.logging import setup_logging
+from cray.cfs.logging import setup_logging, update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 
 LOGGER = logging.getLogger('cray.cfs.inventory')
@@ -99,6 +99,7 @@ def main():
 
 if __name__ == "__main__":
     setup_logging()
+    update_logging(update_options=True)
     exit_code = 0
     try:
         exit_code = main()
