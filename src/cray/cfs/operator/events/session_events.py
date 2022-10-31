@@ -625,7 +625,6 @@ class CFSSessionController:
                     ),  # V1ObjectMeta
                     spec=client.V1PodSpec(
                         service_account_name=self.env['CRAY_CFS_SERVICE_ACCOUNT'],
-                        priority_class_name= "csm-high-priority-service",
                         restart_policy="Never",
                         volumes=[
                             self._job_volumes['CA_PUBKEY'],
