@@ -207,7 +207,7 @@ class ImageRootInventory(CFSInventoryBase):
         host, port, session = get_IMS_API()
 
         archive_name = ""
-        image_map = session_target.get("imageMap", [])
+        image_map = session_target.get("imageMap") or []
         for mapping in image_map:
             if mapping.get("sourceId", "") == ims_id:
                 archive_name = mapping.get("resultName")
