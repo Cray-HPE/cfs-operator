@@ -41,6 +41,7 @@ pipeline {
         DESCRIPTION = "Cray Management System - Configuration Framework Operator"
         IS_STABLE = getBuildIsStable()
         BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
+	DOCKER_BUILDKIT = "1"
     }
 
     stages {
