@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Hewlett Packard Enterprise Development LP
+# Copyright 2019-2022 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,8 @@ RUN apk add --upgrade --no-cache apk-tools busybox && \
     apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
-RUN PIP_INDEX_URL=${PIP_INDEX_URL} \
+
+RUN --mount=type=secret,id=netrc,target=/root/.netrc PIP_INDEX_URL=${PIP_INDEX_URL} \
     pip3 install --no-cache-dir -U pip && \
     pip3 install --no-cache-dir -U wheel && \
     pip3 install --no-cache-dir -r requirements.txt
