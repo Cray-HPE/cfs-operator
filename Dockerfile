@@ -30,7 +30,7 @@ RUN apk add --upgrade --no-cache apk-tools busybox && \
     apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
-RUN pip3 install --no-cache-dir -U pip && \
+RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
     pip3 install --no-cache-dir -U wheel && \
     pip3 install --no-cache-dir -r requirements.txt
 COPY src/ /app/lib
