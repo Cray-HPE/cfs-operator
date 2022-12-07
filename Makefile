@@ -1,4 +1,4 @@
-# Copyright 2021 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2022 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -38,6 +38,10 @@ BUILD_METADATA ?= "1~development~$(shell git rev-parse --short HEAD)"
 SOURCE_NAME ?= ${RPM_NAME}-${RPM_VERSION}
 BUILD_DIR ?= $(PWD)/dist/rpmbuild
 SOURCE_PATH := ${BUILD_DIR}/SOURCES/${SOURCE_NAME}.tar.bz2
+
+ifneq ($(wildcard ${HOME}/.netrc),)
+        DOCKER_ARGS ?= --secret id=netrc,src=${HOME}/.netrc
+endif
 
 all : runbuildprep lint prepare image chart rpm
 chart: chart_setup chart_package chart_test
