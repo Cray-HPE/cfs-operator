@@ -40,6 +40,10 @@ SOURCE_NAME ?= ${RPM_NAME}-${RPM_VERSION}
 BUILD_DIR ?= $(PWD)/dist/rpmbuild
 SOURCE_PATH := ${BUILD_DIR}/SOURCES/${SOURCE_NAME}.tar.bz2
 
+ifneq ($(wildcard ${HOME}/.netrc),)
+        DOCKER_ARGS ?= --secret id=netrc,src=${HOME}/.netrc
+endif
+
 all : runbuildprep lint prepare image chart rpm
 chart: chart_setup chart_package chart_test
 rpm: rpm_package_source rpm_build_source rpm_build
