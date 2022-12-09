@@ -24,8 +24,10 @@
 """
 cray.cfs.inventory.dynamic - Generate an inventory from HSM data.
 """
+import keyword
 import logging
 import os
+import re
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -39,10 +41,9 @@ LOGGER = logging.getLogger(__name__)
 class DynamicInventory(CFSInventoryBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # FIXME TODO CASMCMS-2777
         self.hsm_host = os.getenv('CRAY_SMD_SERVICE_HOST', 'cray-smd')
         self.ca_cert = os.getenv('SSL_CAINFO')
-        LOGGER.debug('API Gateway is: %s', self.hsm_host)
+        LOGGER.debug('HSM host is: %s', self.hsm_host)
         LOGGER.debug('CA Cert location is: %s', self.ca_cert)
         self._init_session()
 
@@ -84,7 +85,13 @@ class DynamicInventory(CFSInventoryBase):
                 members = group['members']['ids']
                 hosts = {}
                 hosts['hosts'] = {str(member): {} for member in members}
-                inventory[str(group['label'])] = hosts
+                group_name = str(group['label'])
+                if not valid_group_name(group_name):
+                    LOGGER.warning(
+                        'Encountered an invalid Ansible group name. Ignoring HSM group {}'.format(
+                            group_name))
+                    continue
+                inventory[group_name] = hosts
             return inventory
         except Exception as e:
             LOGGER.error('Encountered an unknown exception getting groups data: {}'.format(e))
@@ -98,7 +105,13 @@ class DynamicInventory(CFSInventoryBase):
                 members = group['members']['ids']
                 hosts = {}
                 hosts['hosts'] = {str(member): {} for member in members}
-                inventory[str(group['name'])] = hosts
+                group_name = str(group['name'])
+                if not valid_group_name(group_name):
+                    LOGGER.warning(
+                        'Encountered an invalid Ansible group name. \
+                         Ignoring HSM partition {}'.format(group_name))
+                    continue
+                inventory[group_name] = hosts
             return inventory
         except Exception as e:
             LOGGER.error('Encountered an unknown exception getting partitions data: {}'.format(e))
@@ -127,3 +140,11 @@ class DynamicInventory(CFSInventoryBase):
         r = self.session.get(url, verify=self.ca_cert)
         r.raise_for_status()
         return r.json()
+
+
+def valid_group_name(name):
+    if not bool(re.match("^[a-zA-Z_][a-zA-Z0-9_]+$", name)):
+        return False
+    if keyword.iskeyword(name):
+        return False
+    return True

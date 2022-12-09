@@ -27,10 +27,13 @@ cray.cfs.logging - helper functions for logging in CFS
 import logging
 import os
 
+from cray.cfs.operator.cfs.options import options
+
+
 LOGGER = logging.getLogger(__name__)
 
 
-def setup_logging(env_key='CFS_OPERATOR_LOG_LEVEL', default_level='INFO') -> None:
+def setup_logging(env_key='STARTING_LOG_LEVEL', default_level='INFO') -> None:
     """
     Setup the log level base on the environment variable in `env_key`. Fall back
     to the `default_level` if the key doesn't exist in the environment or if an
@@ -48,3 +51,23 @@ def setup_logging(env_key='CFS_OPERATOR_LOG_LEVEL', default_level='INFO') -> Non
 
     if bad_log_level:
         LOGGER.warning('Log level %r is not valid. Falling back to INFO', bad_log_level)
+
+
+def update_logging(update_options=False) -> None:
+    """ Updates the current logging level base on the value in the options database """
+    try:
+        if update_options:
+            options.update()
+        if not options.logging_level:
+            return
+        new_level = logging.getLevelName(options.logging_level.upper())
+        current_level = LOGGER.getEffectiveLevel()
+        if current_level != new_level:
+            LOGGER.log(current_level, 'Changing logging level from {} to {}'.format(
+                logging.getLevelName(current_level), logging.getLevelName(new_level)))
+            logger = logging.getLogger()
+            logger.setLevel(new_level)
+            LOGGER.log(new_level, 'Logging level changed from {} to {}'.format(
+                logging.getLevelName(current_level), logging.getLevelName(new_level)))
+    except Exception as e:
+        LOGGER.error('Error updating logging level: {}'.format(e))
