@@ -55,7 +55,7 @@
   - priv_stat_result
   - pub_stat_result
 
-- name: Capture Private Key for AEE Privilages
+- name: Capture Private Key for AEE Privileges
   shell: "cat {{ cray_cfs_aee_private_key_path }} | base64"
   register: b64_rsa_privkey
   no_log: true
