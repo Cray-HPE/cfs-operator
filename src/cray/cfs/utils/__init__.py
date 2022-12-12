@@ -27,7 +27,6 @@ cray.cfs.utils - helper functions for CFS
 
 import json
 import logging
-import os
 import time
 from urllib3.exceptions import HTTPError, MaxRetryError
 
@@ -38,7 +37,7 @@ from kubernetes.config.config_exception import ConfigException
 LOGGER = logging.getLogger('cray.cfs.utils')
 
 
-def wait_for_aee_finish_v1(cfs_name, cfs_namespace):  # noqa: C901
+def wait_for_aee_finish(cfs_name, cfs_namespace):  # noqa: C901
     """
     Consults k8s API for status information about our CFS/AEE instance; returns
     its exit code.
@@ -92,17 +91,3 @@ def wait_for_aee_finish_v1(cfs_name, cfs_namespace):  # noqa: C901
             time.sleep(5)
             continue
     return ansible_status.exit_code
-
-
-def wait_for_aee_finish_v2(previous_layer):  # noqa: C901
-    """
-    Waits for the complete flag to be touched by the previous layer; returns
-    its exit code.
-    """
-    file_path = os.path.join('/inventory/layer' + str(previous_layer), 'complete')
-    while not os.path.exists(file_path):
-        time.sleep(1)
-
-    with open(file_path, 'r') as f:
-        exit_code = int(f.read().strip())
-    return exit_code

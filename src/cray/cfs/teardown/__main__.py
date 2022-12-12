@@ -72,7 +72,7 @@ import yaml
 from cray.cfs.inventory.image import get_IMS_API
 from cray.cfs.logging import setup_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
-from cray.cfs.utils import wait_for_aee_finish_v1, wait_for_aee_finish_v2
+from cray.cfs.utils import wait_for_aee_finish
 
 LOGGER = logging.getLogger('cray.cfs.teardown')
 
@@ -103,7 +103,7 @@ def _get_targets_v1(cfs_name: str) -> Tuple[Iterable, Iterable]:
         raise
 
 
-def _get_targets_v2(session_succeeded: bool) -> Tuple[Iterable, Iterable]:
+def _get_targets(session_succeeded: bool) -> Tuple[Iterable, Iterable]:
     success = []
     failed = []
     images = _get_image_to_job().keys()
@@ -305,12 +305,7 @@ def main() -> None:  # noqa: C901
     version = get_distribution('cray-cfs').version
     LOGGER.info('Starting CFS IMS Teardown version=%s, namespace=%s', version, cfs_namespace)
     LOGGER.info("Waiting for `ansible` containers to finish.")
-    if 'LAYER_PREVIOUS' in os.environ:
-        v2 = True
-        ansible_status = wait_for_aee_finish_v2(os.environ['LAYER_PREVIOUS'])
-    else:
-        v2 = False
-        ansible_status = wait_for_aee_finish_v1(cfs_name, cfs_namespace)
+    ansible_status = wait_for_aee_finish(cfs_name, cfs_namespace)
     LOGGER.info("AEE container has exited with code=%s", ansible_status)
     teardown_success = True
 
@@ -327,15 +322,7 @@ def main() -> None:  # noqa: C901
     # Ansible run unless an error occurs during the calls to IMS.
 
     # Read in the winners and losers from Redis
-    if v2:
-        failed, success = _get_targets_v2(ansible_status == 0)
-    else:
-        try:
-            failed, success = _get_targets_v1(cfs_name)
-        except Exception:
-            teardown_success = False
-            failed = []
-            success = []
+    failed, success = _get_targets(ansible_status == 0)
 
     # Read in the images and their associated jobs from the breadcrumb
     image_to_job = _get_image_to_job()

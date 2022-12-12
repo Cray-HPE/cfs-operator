@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.16.3] - 12/2/22
 ### Added
 - Authenticate to CSM's artifactory
+- Changed session job structure so that only one git-clone and ansible container are created
 
 ## [1.16.2] - 10/28//22
 ### Changed
