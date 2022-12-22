@@ -41,7 +41,7 @@ pipeline {
         DESCRIPTION = "Cray Management System - Configuration Framework Operator"
         IS_STABLE = getBuildIsStable()
         BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
-	DOCKER_BUILDKIT = "1"
+        DOCKER_BUILDKIT = "1"
     }
 
     stages {
@@ -61,7 +61,9 @@ pipeline {
 
         stage("runBuildPrep") {
             steps {
-                sh "make runbuildprep"
+                 withCredentials([usernamePassword(credentialsId: 'artifactory-algol60-readonly', passwordVariable: 'ARTIFACTORY_PASSWORD', usernameVariable: 'ARTIFACTORY_USERNAME')]) {
+                    sh "make runbuildprep"
+                    }
             }
         }
 

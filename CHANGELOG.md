@@ -24,6 +24,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Spelling corrections.
 - Fixed the exit code when git checkout fails
 
+## [1.16.3] - 2022-12-20
+### Added
+- Add Artifactory authentication to Jenkinsfile
+- Authenticate to CSM's artifactory
+
+## [1.16.2] - 10/28//22
+### Changed
+- Remove high priority from cfs session pods
+
 ## [1.16.1] - 8/4/22
 ### Fixed
 - Escalated pod priority so that configuration has a better chance of running when a node is cordoned
