@@ -49,7 +49,7 @@ from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
 
 LOGGER = logging.getLogger('cray.cfs.inventory.image')
 
-# Supress stack traces while waiting for ssh to be avaiable
+# Suppress stack traces while waiting for ssh to be available
 # Paramiko also raises these errors which we catch and log in a clearer way
 logging.getLogger("paramiko").setLevel(logging.CRITICAL)
 
@@ -60,6 +60,9 @@ except ConfigException:  # pragma: no cover
 
 _api_client = client.ApiClient()
 k8score = client.CoreV1Api(_api_client)
+
+
+IMAGE_HOST_GROUP = "cfs_image"
 
 
 def get_IMS_API() -> Tuple[str, str, requests.Session]:
@@ -109,6 +112,8 @@ class ImageRootInventory(CFSInventoryBase):
         # Create an inventory file with the IMS images, their groups, and
         # connection information, leave a breadcrumb of image to job info too.
         inventory = {}
+        inventory[IMAGE_HOST_GROUP] = {}
+        inventory[IMAGE_HOST_GROUP]['hosts'] = {}
         self.image_to_job = {}
         for group, images in self.get_groups_members().items():
             inventory[group] = {}
@@ -119,11 +124,11 @@ class ImageRootInventory(CFSInventoryBase):
                     'job_id': job_id,
                     'image_id': image,
                 }
-                inventory[group]['hosts'][image] = {
+                inventory[group]['hosts'][image] = {}
+                inventory[IMAGE_HOST_GROUP]['hosts'][image] = {
                     'ansible_host': host,
                     'ansible_port': port,
                     'cray_cfs_image': True,
-                    # yuck, tested on SLE15 only
                     'ansible_python_interpreter': '/usr/bin/env python3',
                     'ansible_ssh_private_key_file': '/etc/ansible/ssh/id_image',
                 }
@@ -149,7 +154,7 @@ class ImageRootInventory(CFSInventoryBase):
         the established host.
 
         Returns a mapping of IMS UUIDs to (job id, image name, host, port) tuples
-        used for ssh connnections to the created ssh containers.
+        used for ssh connections to the created ssh containers.
         """
         key_uuid = ImageRootInventory._upload_public_key(self.cfs_name, self.cfs_namespace)
         ssh_containers = {}
@@ -162,7 +167,7 @@ class ImageRootInventory(CFSInventoryBase):
                 processes.append(
                     Process(
                         target=ImageRootInventory._request_ims_ssh,
-                        args=(mpq, ims_id, self.cfs_name, key_uuid)
+                        args=(mpq, ims_id, self.cfs_name, key_uuid, self.session['target'])
                     )
                 )
 
@@ -196,24 +201,33 @@ class ImageRootInventory(CFSInventoryBase):
             self._remove_public_key(key_uuid)
 
     @staticmethod
-    def _request_ims_ssh(mpq, ims_id: str, cfs_session: str, public_key_id: str) -> None:
+    def _request_ims_ssh(mpq, ims_id: str, cfs_session: str, public_key_id: str,
+                         session_target: dict) -> None:
         """ Kick off IMS customization job and request an SSH jailed container """
         host, port, session = get_IMS_API()
 
-        # Call IMS to get the image name
-        LOGGER.debug("Retrieving IMS image name for id=%s", ims_id)
-        try:
-            resp = session.get("http://{}:{}/images/{}".format(host, port, ims_id))
-            resp.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            raise CFSInventoryError(
-                'Unable to determine the name of IMS image=%r. Reason: %s' % (ims_id, err)
-            ) from err
+        archive_name = ""
+        image_map = session_target.get("imageMap") or []
+        for mapping in image_map:
+            if mapping.get("sourceId", "") == ims_id:
+                archive_name = mapping.get("resultName")
+                break
+        else:
+            # Call IMS to get the image name
+            LOGGER.debug("Retrieving IMS image name for id=%s", ims_id)
+            try:
+                resp = session.get("http://{}:{}/images/{}".format(host, port, ims_id))
+                resp.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                raise CFSInventoryError(
+                    'Unable to determine the name of IMS image=%r. Reason: %s' % (ims_id, err)
+                ) from err
+            archive_name = resp.json()['name'] + "_cfs_" + cfs_session
 
         # Call IMS to kick off a customization job
         body = {
             "job_type": "customize",
-            "image_root_archive_name": resp.json()['name'] + "_cfs_" + cfs_session,
+            "image_root_archive_name": archive_name,
             "artifact_id": ims_id,
             "public_key_id": public_key_id,
             "ssh_containers": [
@@ -230,7 +244,7 @@ class ImageRootInventory(CFSInventoryBase):
         except requests.exceptions.HTTPError as err:
             raise CFSInventoryError(
                 'Unable to create an IMS customization job for IMS image=%r. '
-                'Reason: %s' % (ims_id, err)
+                'Reason: %s. See the IMS logs for more information.' % (ims_id, err)
             )
 
         # Wait for the SSH container to become available, put the resulting SSH

@@ -34,7 +34,8 @@ ENDPOINT = "%s/%s" % (BASE_ENDPOINT, __name__.lower().split('.')[-1])
 
 DEFAULTS = {
     'sessionTTL': '7d',
-    'additionalInventoryUrl': ''
+    'additionalInventoryUrl': '',
+    'loggingLevel': 'INFO'
 }
 
 
@@ -105,6 +106,10 @@ class Options:
     @property
     def additional_inventory_url(self):
         return self.get_option('additionalInventoryUrl', str)
+
+    @property
+    def logging_level(self):
+        return self.get_option('loggingLevel', str)
 
 
 options = Options()
