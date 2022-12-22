@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image teardown now marks failed images correctly
 - Log levels are now controlled by a CFS option
 - Ansible container limits/requests are now configurable
-- Authenticate to CSM's artifactory
 - Changed session job structure so that only one git-clone and ansible container are created
 
 ### Fixed
