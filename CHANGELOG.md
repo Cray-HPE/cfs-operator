@@ -23,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Spelling corrections.
 - Fixed the exit code when git checkout fails
 
-
 ## [1.16.3] - 2022-12-20
 ### Added
 - Add Artifactory authentication to Jenkinsfile
