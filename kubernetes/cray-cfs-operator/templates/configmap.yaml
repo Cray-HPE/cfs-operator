@@ -1,7 +1,7 @@
 {{/*
 MIT License
 
-(C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+(C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -34,6 +34,8 @@ data:
   cray_cfs_util_image: "{{ .Values.util_image.repository }}:{{ .Values.util_image.version }}"
   cray_cfs_aee_image: "{{ .Values.aee_image.repository }}:{{ .Values.aee_image.version }}"
   cray_cfs_ims_image: "{{ .Values.ims_image.repository }}:{{ .Values.ims_image.version | default $baseChartValues.global.appVersion }}"
+  ansible_container_requests: '{"memory": "4Gi", "cpu": "500m"}'
+  ansible_container_limits: '{"memory": "6Gi", "cpu": "8"}'
 
 ---
 apiVersion: v1
