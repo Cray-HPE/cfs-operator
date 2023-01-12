@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -68,6 +68,16 @@ cray-service:
           configMapKeyRef:
             name: cray-cfs-operator-config
             key: cray_cfs_aee_image
+      - name: CRAY_CFS_ANSIBLE_CONTAINER_REQUESTS
+        valueFrom:
+          configMapKeyRef:
+            name: cray-cfs-operator-config
+            key: ansible_container_requests
+      - name: CRAY_CFS_ANSIBLE_CONTAINER_LIMITS
+        valueFrom:
+          configMapKeyRef:
+            name: cray-cfs-operator-config
+            key: ansible_container_limits
       - name: CRAY_CFS_CONFIGMAP_PUBLIC_KEY
         value: "cray-configmap-ca-public-key"
       - name: CRAY_CFS_CA_PUBLIC_KEY
