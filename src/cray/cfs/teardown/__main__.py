@@ -70,9 +70,9 @@ import requests
 import yaml
 
 from cray.cfs.inventory.image import get_IMS_API
-from cray.cfs.logging import setup_logging
+from cray.cfs.logging import setup_logging, update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
-from cray.cfs.utils import wait_for_aee_finish_v1, wait_for_aee_finish_v2
+from cray.cfs.utils import wait_for_aee_finish
 
 LOGGER = logging.getLogger('cray.cfs.teardown')
 
@@ -103,7 +103,7 @@ def _get_targets_v1(cfs_name: str) -> Tuple[Iterable, Iterable]:
         raise
 
 
-def _get_targets_v2(session_succeeded: bool) -> Tuple[Iterable, Iterable]:
+def _get_targets(session_succeeded: bool) -> Tuple[Iterable, Iterable]:
     success = []
     failed = []
     images = _get_image_to_job().keys()
@@ -123,7 +123,7 @@ def _get_image_to_job() -> Mapping[str, str]:
     return image_to_job
 
 
-def _finish_the_job(job_id: str, cfs_name: str) -> None:
+def _finish_the_job(job_id: str, cfs_name: str, completion_flag: str = "complete") -> None:
     """
     Tell IMS to finish the job by touching the /tmp/complete file in the jail.
 
@@ -155,13 +155,13 @@ def _finish_the_job(job_id: str, cfs_name: str) -> None:
             for x in range(20):
                 try:
                     pclient.set_missing_host_key_policy(paramiko.WarningPolicy())
-                    LOGGER.info("Remotely touching complete file for %s:%s", ssh_host,
+                    LOGGER.info("Remotely touching %s file for %s:%s", completion_flag, ssh_host,
                                 str(ssh_port))
                     pclient.connect(
                         ssh_host, port=ssh_port, pkey=key, username='root',
                         password='',
                     )
-                    pclient.exec_command('touch /tmp/complete')
+                    pclient.exec_command('touch /tmp/{}'.format(completion_flag))
                     break
                 except Exception as e:
                     LOGGER.error(e)
@@ -186,7 +186,7 @@ def do_failed(image_id: str, job_id: str, cfs_name: str, queue) -> None:
         None
     """
     try:
-        _finish_the_job(job_id, cfs_name)
+        _finish_the_job(job_id, cfs_name, completion_flag="failed")
     except Exception as err:
         queue.put(
             ('error', image_id, job_id, err)
@@ -305,12 +305,7 @@ def main() -> None:  # noqa: C901
     version = get_distribution('cray-cfs').version
     LOGGER.info('Starting CFS IMS Teardown version=%s, namespace=%s', version, cfs_namespace)
     LOGGER.info("Waiting for `ansible` containers to finish.")
-    if 'LAYER_PREVIOUS' in os.environ:
-        v2 = True
-        ansible_status = wait_for_aee_finish_v2(os.environ['LAYER_PREVIOUS'])
-    else:
-        v2 = False
-        ansible_status = wait_for_aee_finish_v1(cfs_name, cfs_namespace)
+    ansible_status = wait_for_aee_finish(cfs_name, cfs_namespace)
     LOGGER.info("AEE container has exited with code=%s", ansible_status)
     teardown_success = True
 
@@ -327,15 +322,7 @@ def main() -> None:  # noqa: C901
     # Ansible run unless an error occurs during the calls to IMS.
 
     # Read in the winners and losers from Redis
-    if v2:
-        failed, success = _get_targets_v2(ansible_status == 0)
-    else:
-        try:
-            failed, success = _get_targets_v1(cfs_name)
-        except Exception:
-            teardown_success = False
-            failed = []
-            success = []
+    failed, success = _get_targets(ansible_status == 0)
 
     # Read in the images and their associated jobs from the breadcrumb
     image_to_job = _get_image_to_job()
@@ -445,4 +432,5 @@ def main() -> None:  # noqa: C901
 
 if __name__ == '__main__':
     setup_logging()
+    update_logging(update_options=True)
     main()

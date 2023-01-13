@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 1/12/2023
+### Added
+- Add Artifactory authentication to Jenkinsfile
+- Added a new parameter for naming image customization results
+- Added a pointer to IMS logs when image inventory creation fails
+- Added cfs_image host group to image customization inventory
+- Added Ansible configuration values to enable ARA log collection
+
+### Changed
+- Updated dynamic inventory to log and drop invalid HSM group names
+- Image teardown now marks failed images correctly
+- Log levels are now controlled by a CFS option
+- Ansible container limits/requests are now configurable
+- Authenticate to CSM's artifactory
+- Changed session job structure so that only one git-clone and ansible container are created
+
+### Fixed
+- Spelling corrections.
+- Fixed the exit code when git checkout fails
+
 ## [1.16.3] - 2022-12-20
 ### Added
 - Add Artifactory authentication to Jenkinsfile
