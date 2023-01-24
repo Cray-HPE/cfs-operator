@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -132,7 +132,7 @@ class CFSJobMonitor:
     def session_complete(self, session):
         session_name = session['name']
         if self._session_missing(session_name):
-            LOGGER.warning('Session {} was being monitored but can no longer be found')
+            LOGGER.warning('Session {} was being monitored but can no longer be found'.format(session_name))
             return True
 
         job_name = session['status']['session'].get('job')
