@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed defunct files leftover from previous versioning system
 
+### Added
+- Added support for a new configuration parameter for enabling DKMS in IMS
+
 ## [1.17.1] - 1/25/2023
 ### Fixed
 - Increased container memory limits
