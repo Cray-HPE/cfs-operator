@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019, 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019, 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -46,6 +46,7 @@ from requests.packages.urllib3.util.retry import Retry
 from yaml import safe_dump
 
 from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
+import cray.cfs.operator.cfs.configurations as cfs_configurations
 
 LOGGER = logging.getLogger('cray.cfs.inventory.image')
 
@@ -160,6 +161,7 @@ class ImageRootInventory(CFSInventoryBase):
         ssh_containers = {}
         processes = []
         mpq = Queue()
+        require_dkms = configuration_requires_dkms(self.session.get("configuration").get("name"))
 
         try:
             for ims_id in image_groups.keys():
@@ -167,7 +169,7 @@ class ImageRootInventory(CFSInventoryBase):
                 processes.append(
                     Process(
                         target=ImageRootInventory._request_ims_ssh,
-                        args=(mpq, ims_id, self.cfs_name, key_uuid, self.session['target'])
+                        args=(mpq, ims_id, self.cfs_name, key_uuid, self.session['target'], require_dkms)
                     )
                 )
 
@@ -202,7 +204,7 @@ class ImageRootInventory(CFSInventoryBase):
 
     @staticmethod
     def _request_ims_ssh(mpq, ims_id: str, cfs_session: str, public_key_id: str,
-                         session_target: dict) -> None:
+                         session_target: dict, require_dkms: bool = False) -> None:
         """ Kick off IMS customization job and request an SSH jailed container """
         host, port, session = get_IMS_API()
 
@@ -237,6 +239,8 @@ class ImageRootInventory(CFSInventoryBase):
                 }
             ],
         }
+        if require_dkms:
+            body["require_dkms"] = True
         LOGGER.debug("Submitting IMS job with parameters: %s", body)
         try:
             resp = requests.post("http://{}:{}/jobs".format(host, port), json=body)
@@ -396,3 +400,15 @@ class ImageRootInventory(CFSInventoryBase):
             resp.raise_for_status()
         except requests.exceptions.HTTPError as err:
             LOGGER.warning('Unable to delete a public key to IMS. Reason: %s' % err)
+
+
+def configuration_requires_dkms(configuration_name):
+    try:
+        configuration = cfs_configurations.get_configuration(configuration_name)
+    except Exception as e:
+        LOGGER.error(f"Error loading the CFS configuration to check dkms requirements: {e}")
+        return False
+    for layer in configuration.get("layers", []):
+        if layer.get("specialParameters", {}).get("imsRequireDkms", False):
+            return True
+    return False
