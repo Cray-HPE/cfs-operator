@@ -35,7 +35,8 @@ ENDPOINT = "%s/%s" % (BASE_ENDPOINT, __name__.lower().split('.')[-1])
 DEFAULTS = {
     'session_ttl': '7d',
     'additional_inventory_url': '',
-    'logging_level': 'INFO'
+    'logging_level': 'INFO',
+    'debug_wait_time': 3600
 }
 
 
@@ -110,6 +111,10 @@ class Options:
     @property
     def logging_level(self):
         return self.get_option('logging_level', str)
+
+    @property
+    def debug_wait_time(self):
+        return self.get_option('debug_wait_time', str)
 
 
 options = Options()

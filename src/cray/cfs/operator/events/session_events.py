@@ -461,6 +461,10 @@ class CFSSessionController:
 
         ansible_data = [layer for _, layer in configuration]
 
+        debug_wait_time = 0
+        if session_data["debug_on_failure"]:
+            debug_wait_time = options.debug_wait_time
+
         ansible_container = client.V1Container(
             name='ansible',
             image=self.env['CRAY_CFS_AEE_IMAGE'],
@@ -481,6 +485,10 @@ class CFSSessionController:
                 client.V1EnvVar(
                     name='DISABLE_STATE_RECORDING',
                     value=str(disable_state_recording)
+                ),
+                client.V1EnvVar(
+                    name='DEBUG_WAIT_TIME',
+                    value=debug_wait_time
                 )
             ],  # env
             volume_mounts=[
