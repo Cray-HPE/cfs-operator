@@ -24,7 +24,7 @@
 """
 Functions for handling CFS Session Events
 """
-import json
+import ujson as json
 import logging
 import shlex
 import time
@@ -302,10 +302,10 @@ class CFSSessionController:
         Creates the container to clone repos in the configuration
         for this session.
         """
-        repos = [(i, layer['cloneUrl'], layer['commit']) for i, layer in configuration]
+        repos = [(i, layer['clone_url'], layer['commit']) for i, layer in configuration]
         if additional_inventory:
             repos.append(
-                ('hosts', additional_inventory['cloneUrl'], additional_inventory['commit'])
+                ('hosts', additional_inventory['clone_url'], additional_inventory['commit'])
             )
 
         git_command_pieces = []
@@ -557,7 +557,7 @@ class CFSSessionController:
 
         # Git clone containers
         if options.additional_inventory_url and not additional_inventory:
-            additional_inventory = {'cloneUrl': options.additional_inventory_url,
+            additional_inventory = {'clone_url': options.additional_inventory_url,
                                     'commit': 'master'}
         clone_container = self._get_clone_container(configuration, additional_inventory)
 
@@ -586,7 +586,7 @@ class CFSSessionController:
                         name=job_id,
                         labels={
                             'cfsession': session_data['name'],
-                            'cfsversion': 'v2',
+                            'cfsversion': 'v3',
                             'app.kubernetes.io/name': 'cray-cfs-aee',
                             'aee': session_data['name'],
                             'configuration': session_data.get('configuration', {}).get('name', '')

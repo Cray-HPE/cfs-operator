@@ -54,8 +54,7 @@ class CFSJobMonitor:
 
     def _sync_sessions(self):
         # Load incomplete and unmonitored sessions
-        session_list = cfs_sessions.get_sessions()
-        for session in session_list:
+        for session in cfs_sessions.iter_sessions():
             session_status = session.get('status', {}).get('session', {})
             if session['name'] not in self.sessions and \
                     session_status.get('job') and \
@@ -111,8 +110,7 @@ class CFSJobMonitor:
     def cleanup_jobs(self):
         try:
             jobs = self.get_jobs()
-            sessions = cfs_sessions.get_sessions()
-            session_jobs = self.get_session_jobs(sessions)
+            session_jobs = self.get_session_jobs()
             i = 0
             for job in jobs:
                 if job not in session_jobs:
@@ -186,9 +184,9 @@ class CFSJobMonitor:
                 return True
         return False
 
-    def get_session_jobs(self, sessions):
+    def get_session_jobs(self):
         jobs = []
-        for session in sessions:
+        for session in cfs_sessions.iter_sessions():
             job_name = session['status']['session'].get('job')
             if job_name:
                 jobs.append(job_name)
