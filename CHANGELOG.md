@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.16.6] - 7/18/23
+### Changed
+- In [`src/cray/cfs/teardown/__main__.py`](src/cray/cfs/teardown/__main__.py), use `yaml.safe_load()`
+  instead of `yaml.load()`, both for security reasons and because the current function call breaks
+  when moving to `PyYAML` >= 6
+
 ### Dependencies
 - Bump `PyYAML` from 5.4.1 to 6.0.1 to avoid build issue caused by https://github.com/yaml/pyyaml/issues/601
 
