@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -118,7 +118,7 @@ def _get_targets(session_succeeded: bool) -> Tuple[Iterable, Iterable]:
 def _get_image_to_job() -> Mapping[str, str]:
     """ Return the mapping of image ids to job ids """
     with open('/inventory/image_to_job.yaml', 'r') as i2j_file:
-        image_to_job = yaml.load(i2j_file)
+        image_to_job = yaml.safe_load(i2j_file)
     LOGGER.debug("Fetched image_to_job.yaml: %s", image_to_job)
     return image_to_job
 
