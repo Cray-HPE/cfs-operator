@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Dependencies
+- Bump `bcrypt` from 3.1.4 to 3.1.7
+- Bump `cffi` from 1.14.3 to 1.14.6
+- Bump `coverage` from 4.5.2 to 4.5.4
+- Bump `dictdiffer` from 0.8.0 to 0.8.1
+- Bump `google-auth` from 1.6.1 to 1.6.3
+- Bump `Jinja2` from 2.10.1 to 2.10.3
+- Bump `py` from 1.8.0 to 1.8.2
+- Bump `pyasn1` from 0.4.4 to 0.4.8
+- Bump `pyasn1-modules` from 0.2.2 to 0.2.8
+- Bump `rsa` from 4.7 to 4.7.2
+- Bump `urllib3` from 1.25.9 to 1.25.11
+
 ## [1.18.2] - 7/20/2023
 ### Dependencies
 - Bump `cryptography` from 3.2 to 41.0.2 to fix [Improper Certificate Validation CVE](https://security.snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-5777683)
