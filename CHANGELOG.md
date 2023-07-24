@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added debugging wait time for failed sessions
 - Added support for special debug playbooks
+- Added clusterrole permissions so cfs can view virtual services
 
 ## [1.18.3] - 7/25/2023
 ### Dependencies
