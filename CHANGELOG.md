@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.18.3] - 7/25/2023
+### Dependencies
+- Use `update_external_versions` to get latest patch version of `liveness` Python module.
+- Bumped dependency patch versions:
+| Package                  | From     | To       |
+|--------------------------|----------|----------|
+| `bcrypt`                 | 3.1.4    | 3.1.7    |
+| `cffi`                   | 1.14.3   | 1.14.6   |
+| `coverage`               | 4.5.2    | 4.5.4    |
+| `dictdiffer`             | 0.8.0    | 0.8.1    |
+| `google-auth`            | 1.6.1    | 1.6.3    |
+| `Jinja2`                 | 2.10.1   | 2.10.3   |
+| `py`                     | 1.8.0    | 1.8.2    |
+| `pyasn1`                 | 0.4.4    | 0.4.8    |
+| `pyasn1-modules`         | 0.2.2    | 0.2.8    |
+| `rsa`                    | 4.7      | 4.7.2    |
+| `urllib3`                | 1.25.9   | 1.25.11  |
+
 ## [1.18.2] - 7/20/2023
 ### Dependencies
 - Bump `cryptography` from 3.2 to 41.0.2 to fix [Improper Certificate Validation CVE](https://security.snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-5777683)
