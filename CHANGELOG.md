@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for special debug playbooks
 - Added clusterrole permissions so cfs can view virtual services
 
+### Fixed
+- Fixed job labels that were longer than allowed by Kubernetes
+
 ## [1.18.3] - 7/25/2023
 ### Dependencies
 - Use `update_external_versions` to get latest patch version of `liveness` Python module.

@@ -618,11 +618,11 @@ class CFSSessionController:
                     metadata=client.V1ObjectMeta(
                         name=job_id,
                         labels={
-                            'cfsession': session_data['name'],
+                            'cfsession': session_data['name'][:60],
                             'cfsversion': 'v3',
                             'app.kubernetes.io/name': 'cray-cfs-aee',
-                            'aee': session_data['name'],
-                            'configuration': session_data.get('configuration', {}).get('name', '')
+                            'aee': session_data['name'][:60],
+                            'configuration': session_data.get('configuration', {}).get('name', '')[:60]
                         },
                     ),  # V1ObjectMeta
                     spec=client.V1PodSpec(
