@@ -209,10 +209,10 @@ class ImageRootInventory(CFSInventoryBase):
         host, port, session = get_IMS_API()
 
         archive_name = ""
-        image_map = session_target.get("imageMap") or []
+        image_map = session_target.get("image_map") or []
         for mapping in image_map:
-            if mapping.get("sourceId", "") == ims_id:
-                archive_name = mapping.get("resultName")
+            if mapping.get("source_id", "") == ims_id:
+                archive_name = mapping.get("result_name")
                 break
         else:
             # Call IMS to get the image name
@@ -409,6 +409,6 @@ def configuration_requires_dkms(configuration_name):
         LOGGER.error(f"Error loading the CFS configuration to check dkms requirements: {e}")
         return False
     for layer in configuration.get("layers", []):
-        if layer.get("specialParameters", {}).get("imsRequireDkms", False):
+        if layer.get("special_parameters", {}).get("ims_require_dkms", False):
             return True
     return False

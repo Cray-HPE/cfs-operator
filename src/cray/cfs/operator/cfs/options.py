@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 import logging
-import json
+import ujson as json
 from requests.exceptions import HTTPError, ConnectionError
 from urllib3.exceptions import MaxRetryError
 
@@ -33,9 +33,10 @@ LOGGER = logging.getLogger(__name__)
 ENDPOINT = "%s/%s" % (BASE_ENDPOINT, __name__.lower().split('.')[-1])
 
 DEFAULTS = {
-    'sessionTTL': '7d',
-    'additionalInventoryUrl': '',
-    'loggingLevel': 'INFO'
+    'session_ttl': '7d',
+    'additional_inventory_url': '',
+    'logging_level': 'INFO',
+    'debug_wait_time': 3600
 }
 
 
@@ -93,23 +94,27 @@ class Options:
 
     @property
     def session_ttl(self):
-        return self.get_option('sessionTTL', str)
+        return self.get_option('session_ttl', str)
 
     @property
     def default_playbook(self):
-        return self.get_option('defaultPlaybook', str)
+        return self.get_option('default_playbook', str)
 
     @property
     def default_ansible_config(self):
-        return self.get_option('defaultAnsibleConfig', str)
+        return self.get_option('default_ansible_config', str)
 
     @property
     def additional_inventory_url(self):
-        return self.get_option('additionalInventoryUrl', str)
+        return self.get_option('additional_inventory_url', str)
 
     @property
     def logging_level(self):
-        return self.get_option('loggingLevel', str)
+        return self.get_option('logging_level', str)
+
+    @property
+    def debug_wait_time(self):
+        return self.get_option('debug_wait_time', str)
 
 
 options = Options()

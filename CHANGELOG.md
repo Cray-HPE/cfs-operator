@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Disabled concurrent Jenkins builds on same branch/commit
 - Added build timeout to avoid hung builds
+- Moved to the v3 CFS api
+
+### Added
+- Added debugging wait time for failed sessions
+- Added support for special debug playbooks
+- Added clusterrole permissions so cfs can view virtual services
+
+### Fixed
+- Fixed job labels that were longer than allowed by Kubernetes
 
 ## [1.18.3] - 7/25/2023
 ### Dependencies
