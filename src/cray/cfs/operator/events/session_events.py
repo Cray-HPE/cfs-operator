@@ -24,7 +24,7 @@
 """
 Functions for handling CFS Session Events
 """
-import json
+import ujson as json
 import logging
 import shlex
 import time
@@ -302,10 +302,10 @@ class CFSSessionController:
         Creates the container to clone repos in the configuration
         for this session.
         """
-        repos = [(i, layer['cloneUrl'], layer['commit']) for i, layer in configuration]
+        repos = [(i, layer['clone_url'], layer['commit']) for i, layer in configuration]
         if additional_inventory:
             repos.append(
-                ('hosts', additional_inventory['cloneUrl'], additional_inventory['commit'])
+                ('hosts', additional_inventory['clone_url'], additional_inventory['commit'])
             )
 
         git_command_pieces = []
@@ -435,6 +435,8 @@ class CFSSessionController:
         disable_state_recording=False
         if session_data['target']['definition'] == 'image':
             disable_state_recording=True
+        if len(configuration) == 1 and configuration[0][0] == "debug":
+            disable_state_recording=True
         if 'ansible' in session_data:
             ansible_spec = session_data['ansible']
             ansible_config = ansible_spec.get('config', ansible_config)
@@ -461,6 +463,10 @@ class CFSSessionController:
 
         ansible_data = [layer for _, layer in configuration]
 
+        debug_wait_time = 0
+        if session_data["debug_on_failure"]:
+            debug_wait_time = options.debug_wait_time
+
         ansible_container = client.V1Container(
             name='ansible',
             image=self.env['CRAY_CFS_AEE_IMAGE'],
@@ -481,6 +487,10 @@ class CFSSessionController:
                 client.V1EnvVar(
                     name='DISABLE_STATE_RECORDING',
                     value=str(disable_state_recording)
+                ),
+                client.V1EnvVar(
+                    name='DEBUG_WAIT_TIME',
+                    value=str(debug_wait_time)
                 )
             ],  # env
             volume_mounts=[
@@ -519,14 +529,27 @@ class CFSSessionController:
             args=teardown_args,
         )  # V1Container
 
-    def _create_k8s_job(self, session_data, job_id):  # noqa: C901
-        """
-        When a CFS Session is created, kick off the k8s job.
-        """
-        options.update()
 
+    def _get_debug_configuration_data(self, configuration_name):
+        additional_inventory = {}
+        git_configuration_data = []
+        debug_configuration_data = {
+            "clone_url": "",
+            "playbook": f"{configuration_name[len('debug_'):]}.yaml",
+            "layer": "_debug"
+        }
+        ansible_configuration_data = [("debug", debug_configuration_data)]
+        return git_configuration_data, ansible_configuration_data, additional_inventory
+
+
+    def _get_configuration_data(self, session_data):
         configuration_name = session_data['configuration']['name']
-        cfs_config = get_configuration(configuration_name)
+        try:
+            cfs_config = get_configuration(configuration_name)
+        except Exception as e:
+            if configuration_name.startswith("debug_"):
+                return self._get_debug_configuration_data(configuration_name)
+            raise e
         configuration = cfs_config.get('layers', [])
         configuration_limit = session_data['configuration'].get('limit', '')
         additional_inventory = cfs_config.get('additional_inventory', {})
@@ -544,6 +567,16 @@ class CFSSessionController:
             configuration = [(str(i), layer) for i, layer in enumerate(configuration)]
         for i, layer in configuration:
             layer["layer"] = i
+        return configuration, configuration, additional_inventory
+
+
+    def _create_k8s_job(self, session_data, job_id):  # noqa: C901
+        """
+        When a CFS Session is created, kick off the k8s job.
+        """
+        options.update()
+
+        git_configuration_data, ansible_configuration_data, additional_inventory = self._get_configuration_data(session_data)
 
         ansible_config = options.default_ansible_config
         if 'ansible' in session_data:
@@ -557,15 +590,15 @@ class CFSSessionController:
 
         # Git clone containers
         if options.additional_inventory_url and not additional_inventory:
-            additional_inventory = {'cloneUrl': options.additional_inventory_url,
+            additional_inventory = {'clone_url': options.additional_inventory_url,
                                     'commit': 'master'}
-        clone_container = self._get_clone_container(configuration, additional_inventory)
+        clone_container = self._get_clone_container(git_configuration_data, additional_inventory)
 
         # Inventory container
         inventory_container = self._get_inventory_container(session_data)
 
         # Ansible containers
-        ansible_container = self._get_ansible_container(session_data, configuration)
+        ansible_container = self._get_ansible_container(session_data, ansible_configuration_data)
 
         # Assemble the containers, if this is image customization, add the IMS
         # teardown containers to the list
@@ -585,11 +618,11 @@ class CFSSessionController:
                     metadata=client.V1ObjectMeta(
                         name=job_id,
                         labels={
-                            'cfsession': session_data['name'],
-                            'cfsversion': 'v2',
+                            'cfsession': session_data['name'][:60],
+                            'cfsversion': 'v3',
                             'app.kubernetes.io/name': 'cray-cfs-aee',
-                            'aee': session_data['name'],
-                            'configuration': session_data.get('configuration', {}).get('name', '')
+                            'aee': session_data['name'][:60],
+                            'configuration': session_data.get('configuration', {}).get('name', '')[:60]
                         },
                     ),  # V1ObjectMeta
                     spec=client.V1PodSpec(

@@ -27,7 +27,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 PROTOCOL = 'http'
-API_VERSION = 'v2'
+API_VERSION = 'v3'
 SERVICE_NAME = 'cray-cfs-api'
 ENDPOINT = "%s://%s/%s" % (PROTOCOL, SERVICE_NAME, API_VERSION)
 

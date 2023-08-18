@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-import json
+import ujson as json
 import logging
 from requests.exceptions import HTTPError, ConnectionError
 from urllib3.exceptions import MaxRetryError
@@ -53,12 +53,26 @@ def get_session(session_id):
     return cfs_session
 
 
-def get_sessions():
+def iter_sessions():
+    """Get information for all CFS sessions"""
+    next_parameters = None
+    while True:
+        data = get_sessions(parameters=next_parameters)
+        for session in data["sessions"]:
+            yield session
+        next_parameters = data["next"]
+        if not next_parameters:
+            break
+
+
+def get_sessions(parameters=None):
     """Get information for all CFS sessions"""
     url = ENDPOINT
     session = requests_retry_session()
     try:
-        response = session.get(url)
+        if not parameters:
+            parameters = {}
+        response = session.get(url, params=parameters)
         response.raise_for_status()
         cfs_sessions = json.loads(response.text)
     except (ConnectionError, MaxRetryError) as e:

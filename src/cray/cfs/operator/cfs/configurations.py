@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-import json
+import ujson as json
 import logging
 from requests.exceptions import HTTPError, ConnectionError
 from urllib3.exceptions import MaxRetryError
@@ -33,10 +33,9 @@ LOGGER = logging.getLogger(__name__)
 ENDPOINT = "%s/%s" % (BASE_ENDPOINT, __name__.lower().split('.')[-1])
 
 
-def get_configuration(id):
+def get_configuration(configuration_id):
     """Get information for a single configuration stored in CFS"""
-    url = ENDPOINT + '/' + id
-    configuration = {}
+    url = ENDPOINT + '/' + configuration_id
     session = requests_retry_session()
     try:
         response = session.get(url)

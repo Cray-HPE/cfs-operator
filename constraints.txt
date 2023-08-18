@@ -40,6 +40,7 @@ requests==2.22.0
 requests-oauthlib==1.0.0
 rsa==4.7.2
 setuptools>=49.3.2
+ujson==5.8.0
 urllib3==1.25.11
 virtualenv==15.2.0
 websocket-client==0.54.0
