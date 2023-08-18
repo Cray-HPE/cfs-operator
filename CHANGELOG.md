@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - When building unstable charts, have them point to the corresponding unstable cfs-operator images
 
+### Fixed
+- Fixed job labels that were longer than allowed by Kubernetes
+
 ## [1.17.3] - 7/20/2023
 ### Dependencies
 - Bump `cryptography` from 3.2 to 41.0.2 to fix [Improper Certificate Validation CVE](https://security.snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-5777683)
