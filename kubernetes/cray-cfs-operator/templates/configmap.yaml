@@ -66,6 +66,7 @@ data:
     deprecation_warnings  = False
     display_ok_hosts      = no
     display_skipped_hosts = no
+    vars_plugins_enabled  = community.sops.sops,host_group_vars
     interpreter_python    = /usr/bin/python3
 
     [ara]
@@ -75,3 +76,8 @@ data:
     [ssh_connection]
     pipelining = True
     ssh_args = -o ServerAliveInterval=30 -o ControlMaster=auto -o ControlPersist=60s
+    
+    [community.sops]
+    vars_stage = all
+    vars_cache = true
+
