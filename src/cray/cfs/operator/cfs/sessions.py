@@ -53,9 +53,9 @@ def get_session(session_id):
     return cfs_session
 
 
-def iter_sessions():
+def iter_sessions(parameters=None):
     """Get information for all CFS sessions"""
-    next_parameters = None
+    next_parameters = parameters
     while True:
         data = get_sessions(parameters=next_parameters)
         for session in data["sessions"]:

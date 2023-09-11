@@ -47,6 +47,8 @@ from yaml import safe_dump
 
 from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
 import cray.cfs.operator.cfs.configurations as cfs_configurations
+import cray.cfs.operator.cfs.sessions as cfs_sessions
+
 
 LOGGER = logging.getLogger('cray.cfs.inventory.image')
 
@@ -254,6 +256,7 @@ class ImageRootInventory(CFSInventoryBase):
         # Wait for the SSH container to become available, put the resulting SSH
         # connection information into the processing queue.
         job_id = resp.json()['id']
+        cfs_sessions.update_session_status(cfs_session, {'ims_job': job_id})
         mpq.put(ImageRootInventory._wait_for_ssh_container(ims_id, job_id, cfs_session))
 
     @staticmethod  # noqa: C901

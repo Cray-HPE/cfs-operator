@@ -40,7 +40,9 @@ import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.operator.cfs.options import options
 from cray.cfs.operator.cfs.configurations import get_configuration
 from cray.cfs.operator.events.job_events import CFSJobMonitor
+from cray.cfs.operator.events.ims_monitor import IMSJobMonitor
 from cray.cfs.operator.kafka_utils import KafkaWrapper
+from cray.cfs.utils.clients.ims.jobs import delete_job as delete_ims_job
 
 LOGGER = logging.getLogger('cray.cfs.operator.events.session_events')
 DEFAULT_ANSIBLE_CONFIG = 'cfs-default-ansible-cfg'
@@ -70,9 +72,11 @@ class CFSSessionController:
     def __init__(self, env):
         self.env = env
         self.job_monitor = CFSJobMonitor(env)
+        self.ims_monitor = IMSJobMonitor()
 
     def run(self):  # pragma: no cover
         self.job_monitor.run()
+        self.ims_monitor.run()
         threading.Thread(target=self._run).start()
 
     def _run(self):  # pragma: no cover
@@ -120,6 +124,9 @@ class CFSSessionController:
         job_id = event_data.get('status', {}).get('session', {}).get('job')
         if job_id:
             self._delete_job(session_name, job_id)
+        ims_job_id = event_data.get('status', {}).get('session', {}).get('ims_job')
+        if ims_job_id:
+            self._delete_ims_job(session_name, ims_job_id)
 
     def _send_retry(self, event, kafka):
         attempt_count = 0
@@ -155,6 +162,14 @@ class CFSSessionController:
                 LOGGER.debug('Job "%s" deletion response: %s', job_id, err)
             else:
                 LOGGER.warning("Exception calling BatchV1Api->delete_namespaced_job", exc_info=True)
+
+    def _delete_ims_job(self, session_name, ims_job_id):
+        """ Delete the IMS Job """
+        try:
+            delete_ims_job(ims_job_id)
+            LOGGER.info("IMS Job deleted for CFS Session=%s", session_name)
+        except Exception:
+            LOGGER.warning(f"Failed to delete IMS job {ims_job_id} for CFS session {session_name}")
 
     def _set_environment_variables(self, session_data):
         """
