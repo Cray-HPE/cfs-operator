@@ -163,7 +163,7 @@ class CFSJobMonitor:
             cfs_sessions.update_session_status(session_name,
                                                data={'status': 'complete',
                                                      'succeeded': 'true',
-                                                     'completionTime': completion_time})
+                                                     'completion_time': completion_time})
             return True
         elif job.status.failed:
             LOGGER.info("EVENT: JobFail %s", session_name)
@@ -172,7 +172,7 @@ class CFSJobMonitor:
             cfs_sessions.update_session_status(session_name,
                                                data={'status': 'complete',
                                                      'succeeded': 'false',
-                                                     'completionTime': completion_time})
+                                                     'completion_time': completion_time})
             return True
         return False
 
