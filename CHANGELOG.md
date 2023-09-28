@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added SOPS support to ansible.cfg file, as provided through helm chart
 - Added CFS clean-up of IMS jobs that it creates for image customization.
+### Changed
+- Perform version bump to new version of ansible (1.15.x)
 
 ## [1.19.0] - 8/18/2023
 ### Changed
