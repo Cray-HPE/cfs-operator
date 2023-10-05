@@ -30,10 +30,9 @@
 #   tag: "" (default = "latest")
 #   pullPolicy: "" (default = "IfNotPresent")
 
-util_image:
-  repository: artifactory.algol60.net/csm-docker/stable/docker.io/alpine/git
-  version: 2.32.0
-ims_image:
+clone_image:
+  repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
+inventory_image:
   repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
 aee_image:
   repository: artifactory.algol60.net/csm-docker/stable/cray-aee
@@ -86,13 +85,10 @@ cray-service:
         value: "cfstrustcertificate"
       - name: CRAY_CFS_TRUST_KEY_SECRET
         value: "cfstrust"
-      - name: CRAY_CFS_IMS_IMAGE
-        valueFrom:
-          configMapKeyRef:
-            name: cray-cfs-operator-config
-            key: cray_cfs_ims_image
       - name: CRAY_CFS_SERVICE_ACCOUNT
         value: "cray-cfs"
+      - name: VAULT_ADDR
+        value: "http://cray-vault.vault:8200"
       - name: VCS_USER_CREDENTIALS
         value: "vcs-user-credentials"
       resources:

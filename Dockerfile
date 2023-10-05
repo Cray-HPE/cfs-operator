@@ -27,7 +27,7 @@ WORKDIR /app
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
 RUN apk add --upgrade --no-cache apk-tools busybox && \
 	apk update && \
-    apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash && \
+    apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash git && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
 RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
@@ -36,6 +36,7 @@ RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir
 COPY src/ /app/lib
 COPY .version /app/lib/
 RUN cd /app/lib && pip3 install --no-cache-dir .
+RUN chmod 755 $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/cray/cfs/clone/askpass.py
 
 # Nox Environment
 FROM base as nox

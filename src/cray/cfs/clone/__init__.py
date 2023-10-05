@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,31 +22,3 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-apiVersion: v2
-name: cray-cfs-operator
-version: 0.0.0-chart
-description: Kubernetes resources for cfs-operator
-keywords:
-- cfs
-- cray-cfs-operator
-home: https://github.com/Cray-HPE/cfs-operator
-sources:
-- https://github.com/Cray-HPE/cfs-operator
-- https://github.com/Cray-HPE/ansible-execution-environment
-dependencies:
-- name: cray-service
-  version: ^7.0.0
-  repository: https://artifactory.algol60.net/artifactory/csm-helm-charts/
-maintainers:
-- name: rbak-hpe
-  email: ryan.bak@hpe.com
-- name: rkleinman-hpe
-  email: randy.kleinman@hpe.com
-appVersion: 0.0.0-image
-annotations:
-  artifacthub.io/images: |
-    - name: cray-cfs-operator
-      image: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator:0.0.0-image
-    - name: cray-aee
-      image: artifactory.algol60.net/csm-docker/stable/cray-aee:0.0.0-aee
-  artifacthub.io/license: MIT
