@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## [1.21.0] - 9/28/2023
+### Changed
+- Pull in upstream changes for AEE and associated ansible-galaxy mods
+
 ## [1.20.0] - 9/13/2023
 ### Added
 - Added SOPS support to ansible.cfg file, as provided through helm chart
