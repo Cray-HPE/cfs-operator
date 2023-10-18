@@ -26,11 +26,11 @@ Functions for handling CFS Session Events
 """
 import ujson as json
 import logging
+import os
 import shlex
 import time
 import threading
 import uuid
-
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -188,6 +188,14 @@ class CFSSessionController:
             name='SESSION_NAME',
             value=session_data['name']
         )
+        self._job_env['SESSION_CONFIGURATION_NAME'] = client.V1EnvVar(
+            name='SESSION_CONFIGURATION_NAME',
+            value=session_data['configuration']['name']
+        )
+        self._job_env['SESSION_CONFIGURATION_LIMIT'] = client.V1EnvVar(
+            name='SESSION_CONFIGURATION_LIMIT',
+            value=session_data['configuration']['limit']
+        )
         self._job_env['RESOURCE_NAMESPACE'] = client.V1EnvVar(
             name='RESOURCE_NAMESPACE',
             value=self.env['RESOURCE_NAMESPACE']
@@ -196,8 +204,8 @@ class CFSSessionController:
             name='SSL_CAINFO',
             value='/etc/cray/ca/certificate_authority.crt'
         )
-        self._job_env['VCS_USER'] = client.V1EnvVar(
-            name='VCS_USER',
+        self._job_env['VCS_USERNAME'] = client.V1EnvVar(
+            name='VCS_USERNAME',
             value_from=client.V1EnvVarSource(
                 secret_key_ref=client.V1SecretKeySelector(
                     key='vcs_username',
@@ -215,6 +223,18 @@ class CFSSessionController:
                     optional=False
                 )
             )
+        )
+        self._job_env['GIT_RETRY_MAX'] = client.V1EnvVar(
+            name='GIT_RETRY_MAX',
+            value=str(os.environ.get("CFS_GIT_RETRY_MAX", 60))
+        )
+        self._job_env['GIT_RETRY_DELAY'] = client.V1EnvVar(
+            name='GIT_RETRY_DELAY',
+            value=str(os.environ.get("CFS_GIT_RETRY_DELAY", 10))
+        )
+        self._job_env['VAULT_ADDR'] = client.V1EnvVar(
+            name='VAULT_ADDR',
+            value=str(os.environ.get("VAULT_ADDR", ""))
         )
 
     def _set_volume_mounts(self):
@@ -312,68 +332,11 @@ class CFSSessionController:
             ),  # V1SecretVolumeSource
         )  # V1Volume
 
-    def _get_clone_container(self, configuration, additional_inventory):
+    def _get_clone_container(self):
         """
         Creates the container to clone repos in the configuration
         for this session.
         """
-        repos = [(i, layer['clone_url'], layer['commit']) for i, layer in configuration]
-        if additional_inventory:
-            repos.append(
-                ('hosts', additional_inventory['clone_url'], additional_inventory['commit'])
-            )
-
-        git_command_pieces = []
-        git_credentials_helper = 'git config --global credential.helper store'
-        git_command_setup = 'RETRIES={retries}; '\
-                            'DELAY={delay}; '\
-                            'COUNT=1; '\
-                            '{credentials_helper}; '.format(
-                                  retries=self.env.get('CFS_GIT_RETRY_MAX', 60),
-                                  delay=self.env.get('CFS_GIT_RETRY_DELAY', 10),
-                                  credentials_helper=git_credentials_helper)
-        git_command_pieces.append(git_command_setup)
-
-        for i, clone_url, commit in repos:
-            directory = SHARED_DIRECTORY + '/layer' + i
-            if i == 'hosts':
-                directory = SHARED_DIRECTORY + '/hosts'
-
-            split_url = clone_url.split('/')
-            git_credentials_setup = 'echo "{}" > ~/.git-credentials'.format(
-                ''.join([
-                    split_url[0],
-                    '//${VCS_USER//[$\'\t\r\n\']}:${VCS_PASSWORD//[$\'\t\r\n\']}@',
-                    split_url[2]])
-            )
-            git_command = '{credentials_setup}; '\
-                          'mkdir -p {directory}; '\
-                          'while true; do '\
-                          'git clone {clone_url} {directory}; '\
-                          'if [ $? -eq 0 ]; then '\
-                          'echo "Cloning successful"; '\
-                          'cd {directory}; '\
-                          'git checkout {commit}; '\
-                          'if [ $? -eq 0 ]; then '\
-                          'break; '\
-                          'fi; '\
-                          'exit 1; '\
-                          'fi; '\
-                          'if [ $COUNT -gt $RETRIES ]; then '\
-                          'echo "Cloning exceeded retry limit - Stopping"; '\
-                          'exit 1; '\
-                          'fi; '\
-                          'echo "Cloning failed - Retrying"; '\
-                          'let COUNT=$COUNT+1; '\
-                          'sleep $DELAY; '\
-                          'done; '.format(
-                              credentials_setup=git_credentials_setup,
-                              clone_url=clone_url,
-                              commit=commit,
-                              directory=directory)
-            git_command_pieces.append(git_command)
-        git_command = "".join(git_command_pieces)
-
         clone_container = client.V1Container(
             name='git-clone',
             image=self.env['CRAY_CFS_UTIL_IMAGE'],
@@ -382,10 +345,15 @@ class CFSSessionController:
                 self._job_volume_mounts['CA_PUBKEY']
             ],  # V1VolumeMount
             env=[self._job_env['GIT_SSL_CAINFO'],
-                 self._job_env['VCS_USER'],
-                 self._job_env['VCS_PASSWORD']],  # env
+                 self._job_env['VCS_USERNAME'],
+                 self._job_env['VCS_PASSWORD'],
+                 self._job_env['SESSION_CONFIGURATION_NAME'],
+                 self._job_env['SESSION_CONFIGURATION_LIMIT'],
+                 self._job_env['GIT_RETRY_MAX'],
+                 self._job_env['GIT_RETRY_DELAY'],
+                 self._job_env['VAULT_ADDR']],  # env
             command=["/bin/sh", "-c"],  # command
-            args=[git_command],  # args
+            args=["python3 -m cray.cfs.clone"],  # args
         )  # V1Container
 
         return clone_container
@@ -419,7 +387,7 @@ class CFSSessionController:
 
         return client.V1Container(
             name='inventory',
-            image=self.env['CRAY_CFS_IMS_IMAGE'],
+            image=self.env['CRAY_CFS_UTIL_IMAGE'],
             volume_mounts=[
                 self._job_volume_mounts['CONFIG_VOL'],
                 self._job_volume_mounts['ANSIBLE_CONFIG'],
@@ -528,7 +496,7 @@ class CFSSessionController:
 
         return client.V1Container(
             name='teardown',
-            image=self.env['CRAY_CFS_IMS_IMAGE'],
+            image=self.env['CRAY_CFS_UTIL_IMAGE'],
             volume_mounts=[
                 self._job_volume_mounts['CONFIG_VOL'],
             ],  # V1VolumeMount
@@ -546,15 +514,13 @@ class CFSSessionController:
 
 
     def _get_debug_configuration_data(self, configuration_name):
-        additional_inventory = {}
-        git_configuration_data = []
         debug_configuration_data = {
             "clone_url": "",
             "playbook": f"{configuration_name[len('debug_'):]}.yaml",
             "layer": "_debug"
         }
         ansible_configuration_data = [("debug", debug_configuration_data)]
-        return git_configuration_data, ansible_configuration_data, additional_inventory
+        return ansible_configuration_data
 
 
     def _get_configuration_data(self, session_data):
@@ -567,7 +533,6 @@ class CFSSessionController:
             raise e
         configuration = cfs_config.get('layers', [])
         configuration_limit = session_data['configuration'].get('limit', '')
-        additional_inventory = cfs_config.get('additional_inventory', {})
 
         if configuration_limit:
             limits = configuration_limit.split(',')
@@ -582,7 +547,7 @@ class CFSSessionController:
             configuration = [(str(i), layer) for i, layer in enumerate(configuration)]
         for i, layer in configuration:
             layer["layer"] = i
-        return configuration, configuration, additional_inventory
+        return configuration
 
 
     def _create_k8s_job(self, session_data, job_id):  # noqa: C901
@@ -591,7 +556,7 @@ class CFSSessionController:
         """
         options.update()
 
-        git_configuration_data, ansible_configuration_data, additional_inventory = self._get_configuration_data(session_data)
+        ansible_configuration_data = self._get_configuration_data(session_data)
 
         ansible_config = options.default_ansible_config
         if 'ansible' in session_data:
@@ -603,11 +568,7 @@ class CFSSessionController:
         self._set_volume_mounts()
         self._set_volumes(ansible_config)
 
-        # Git clone containers
-        if options.additional_inventory_url and not additional_inventory:
-            additional_inventory = {'clone_url': options.additional_inventory_url,
-                                    'commit': 'master'}
-        clone_container = self._get_clone_container(git_configuration_data, additional_inventory)
+        clone_container = self._get_clone_container()
 
         # Inventory container
         inventory_container = self._get_inventory_container(session_data)

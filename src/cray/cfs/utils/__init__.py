@@ -91,3 +91,18 @@ def wait_for_aee_finish(cfs_name, cfs_namespace):  # noqa: C901
             time.sleep(5)
             continue
     return ansible_status.exit_code
+
+
+def apply_configuration_limit(configuration_layers: list, configuration_limit: str) -> list[tuple[str, dict]]:
+        if configuration_limit:
+            limits = configuration_limit.split(',')
+            if all([x.isdigit() for x in limits]):
+                limits = [int(x) for x in limits]
+                configuration = [(str(x), configuration_layers[x]) for x in sorted(limits)
+                                 if (0 < x < len(configuration_layers))]
+            else:
+                configuration = [(str(i), layer) for i, layer in enumerate(configuration_layers)
+                                 if layer.get('name', '') in configuration_limit]
+        else:
+            configuration = [(str(i), layer) for i, layer in enumerate(configuration_layers)]
+        return configuration
