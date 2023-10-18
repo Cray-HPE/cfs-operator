@@ -8,3 +8,5 @@ redis
 liveness
 kafka-python
 ujson
+hvac
+gitpython

@@ -41,6 +41,7 @@ setup(
     url="https://github.com/Cray-HPE/cfs-operator",
     packages=find_namespace_packages(
         include=(
+            'cray.cfs.clone',
             'cray.cfs.inventory',
             'cray.cfs.inventory.image',
             'cray.cfs.logging',

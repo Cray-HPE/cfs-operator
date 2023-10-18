@@ -35,6 +35,7 @@ ENDPOINT = "%s/%s" % (BASE_ENDPOINT, __name__.lower().split('.')[-1])
 DEFAULTS = {
     'session_ttl': '7d',
     'additional_inventory_url': '',
+    'additional_inventory_source': '',
     'logging_level': 'INFO',
     'debug_wait_time': 3600
 }
@@ -107,6 +108,10 @@ class Options:
     @property
     def additional_inventory_url(self):
         return self.get_option('additional_inventory_url', str)
+
+    @property
+    def additional_inventory_source(self):
+        return self.get_option('additional_inventory_source', str)
 
     @property
     def logging_level(self):
