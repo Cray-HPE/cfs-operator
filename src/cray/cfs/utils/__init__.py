@@ -99,7 +99,7 @@ def apply_configuration_limit(configuration_layers: list, configuration_limit: s
             if all([x.isdigit() for x in limits]):
                 limits = [int(x) for x in limits]
                 configuration = [(str(x), configuration_layers[x]) for x in sorted(limits)
-                                 if (0 < x < len(configuration_layers))]
+                                 if (0 <= x < len(configuration_layers))]
             else:
                 configuration = [(str(i), layer) for i, layer in enumerate(configuration_layers)
                                  if layer.get('name', '') in configuration_limit]
