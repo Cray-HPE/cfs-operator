@@ -15,7 +15,8 @@ google-auth==1.6.3
 idna==2.8
 Jinja2==2.10.3
 kafka-python==2.0.2
-kubernetes==9.0.1
+# CSM 1.6 uses Kubernetes 1.22, so use client v22.x to ensure compatability
+kubernetes==22.6.0
 liveness==0.0.0-liveness
 MarkupSafe==1.1.1
 mccabe==0.6.1
