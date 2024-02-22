@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Dependencies
 - Bump `kubernetes` from 9.0.1 to 22.6.0 to match CSM 1.6 Kubernetes version
+- Bump `cray-aee` from 1.15 to 1.16 for CSM 1.6
 
 ## [1.22.1] - 10/23/2023
 ### Fixed
