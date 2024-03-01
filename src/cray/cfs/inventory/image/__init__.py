@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019, 2021-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019, 2021-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -351,17 +351,29 @@ class ImageRootInventory(CFSInventoryBase):
             )
             time.sleep(2)
             try:
-                client.connect(host, port=int(port), password="", timeout=poll)
-            except paramiko.AuthenticationException:
-                # SSH is up even though we cannot authenticate
-                client.close()
-                return
+                # NOTE: this is the same command that the ansible container uses to test
+                #  the ssh connection
+                client.connect(host, port=int(port), key_filename='/inventory/ssh/id_image', timeout=poll)
+                stdin, stdout, stderr = client.exec_command("echo ~root && sleep 0")
+                rc = stdout.channel.recv_exit_status()
+                if rc != 0:
+                    # command failed - log output and try again
+                    for line in iter(lambda: stderr.readline(2048).rstrip(), ""):
+                        LOGGER.info(f"  STDERR: {line}")
+                    for line in iter(lambda: stdout.readline(2048).rstrip(), ""):
+                        LOGGER.info(f"  STDOUT: {line}")
+                    continue
+            except paramiko.AuthenticationException as e:
+                # SSH is up, but we need authentication to be available
+                LOGGER.info("Error while waiting for SSH to be authenticated: {}. Retrying..".format(e))
+                continue
             except (socket.timeout, SSHException) as e:
                 LOGGER.info("Error while waiting for SSH to be available: {}. Retrying..".format(e))
                 continue
             except Exception as e:
                 raise CFSInventoryError("Unexpected error connecting to the IMS container", e)
 
+            LOGGER.info("Closing client connection")
             client.close()
             return
 
