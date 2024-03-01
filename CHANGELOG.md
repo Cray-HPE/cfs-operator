@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.24.0] - 03/01/2024
+### Changed
+- CASMCMS-8896 - enhance the ssh test for if the connection is ready for use.
+
 ## [1.23.0] - 02/22/2024
 ### Dependencies
 - Bump `kubernetes` from 9.0.1 to 22.6.0 to match CSM 1.6 Kubernetes version
