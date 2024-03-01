@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.24.0] - 03/01/2024
+### Changed
 - CASMCMS-8896 - enhance the ssh test for if the connection is ready for use.
 
 ## [1.23.0] - 02/22/2024
