@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.22.3] - 06/04/2024
+### Changed
+- When building unstable charts, have them point to the corresponding unstable cfs-operator images
+
+### Dependencies
+- CASMCMS-9018/CAST-35618: Bump `paramiko` from 2.7.2 to 2.11.1 to prevent Blowfish deprecation warnings.
+
 ## [1.22.2] - 03/05/2024
+### Changed
 - CASMCMS-8896 - enhance the ssh test for if the connection is ready for use.
 
 ## [1.22.1] - 10/23/2023
