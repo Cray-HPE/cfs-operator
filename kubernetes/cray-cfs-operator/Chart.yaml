@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2022, 2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -45,7 +45,7 @@ appVersion: 0.0.0-image
 annotations:
   artifacthub.io/images: |
     - name: cray-cfs-operator
-      image: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator:0.0.0-image
+      image: artifactory.algol60.net/csm-docker/S-T-A-B-L-E/cray-cfs-operator:0.0.0-image
     - name: cray-aee
       image: artifactory.algol60.net/csm-docker/stable/cray-aee:0.0.0-aee
   artifacthub.io/license: MIT

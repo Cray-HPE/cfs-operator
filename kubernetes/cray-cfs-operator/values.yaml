@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,9 +31,9 @@
 #   pullPolicy: "" (default = "IfNotPresent")
 
 clone_image:
-  repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
+  repository: artifactory.algol60.net/csm-docker/S-T-A-B-L-E/cray-cfs-operator
 inventory_image:
-  repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
+  repository: artifactory.algol60.net/csm-docker/S-T-A-B-L-E/cray-cfs-operator
 aee_image:
   repository: artifactory.algol60.net/csm-docker/stable/cray-aee
   version: 0.0.0-aee
@@ -51,7 +51,7 @@ cray-service:
     cray-cfs-operator:
       name: cray-cfs-operator
       image:
-        repository: artifactory.algol60.net/csm-docker/stable/cray-cfs-operator
+        repository: artifactory.algol60.net/csm-docker/S-T-A-B-L-E/cray-cfs-operator
       env:
       - name: CFS_OPERATOR_LOG_LEVEL
         value: "INFO"
