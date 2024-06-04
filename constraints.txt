@@ -23,7 +23,7 @@ mccabe==0.6.1
 more-itertools==7.0.0
 nox==2018.10.17
 oauthlib==2.1.0
-paramiko==2.7.2
+paramiko==2.11.1
 pluggy==0.8.1
 py==1.8.2
 pyasn1==0.4.8

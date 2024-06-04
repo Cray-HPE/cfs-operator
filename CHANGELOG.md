@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- When building unstable charts, have them point to the corresponding unstable cfs-operator images
+
+### Dependencies
+- CASMCMS-9018/CAST-35618: Bump `paramiko` from 2.7.2 to 2.11.1 to prevent Blowfish deprecation warnings.
 
 ## [1.24.0] - 03/01/2024
 ### Changed
