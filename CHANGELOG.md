@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.25.0] - 06/04/2024
+### Changed
+- When building unstable charts, have them point to the corresponding unstable cfs-operator images
+
+### Dependencies
+- CASMCMS-9018/CAST-35618: Bump `paramiko` from 2.7.2 to 2.11.1 to prevent Blowfish deprecation warnings.
+
 ## [1.24.0] - 03/01/2024
 ### Changed
 - CASMCMS-8896 - enhance the ssh test for if the connection is ready for use.
