@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -573,26 +573,7 @@ class CFSSessionController:
         if session_data['target']['definition'] == "image":
             containers.append(self._get_teardown_container())
 
-        v1_job = client.V1Job(
-            api_version='batch/v1',
-            kind='Job',
-            metadata=client.V1ObjectMeta(
-                name=job_id,
-            ),
-            spec=client.V1JobSpec(
-                backoff_limit=0,
-                template=client.V1PodTemplateSpec(
-                    metadata=client.V1ObjectMeta(
-                        name=job_id,
-                        labels={
-                            'cfsession': session_data['name'][:60],
-                            'cfsversion': 'v2',
-                            'app.kubernetes.io/name': 'cray-cfs-aee',
-                            'aee': session_data['name'][:60],
-                            'configuration': session_data.get('configuration', {}).get('name', '')[:60]
-                        },
-                    ),  # V1ObjectMeta
-                    spec=client.V1PodSpec(
+        v1_pod_spec = client.V1PodSpec(
                         service_account_name=self.env['CRAY_CFS_SERVICE_ACCOUNT'],
                         restart_policy="Never",
                         volumes=[
@@ -605,9 +586,37 @@ class CFSSessionController:
                         init_containers=[clone_container],
                         containers=containers,
                     )  # V1PodSpec
-                )  # V1PodTemplateSpec
-            )  # V1JobSpec
-        )  # V1Job
+
+        v1_job_metadata = client.V1ObjectMeta(
+                        name=job_id,
+                        labels={
+                            'cfsession': session_data['name'][:60],
+                            'cfsversion': 'v2',
+                            'app.kubernetes.io/name': 'cray-cfs-aee',
+                            'aee': session_data['name'][:60],
+                            'configuration': session_data.get('configuration', {}).get('name', '')[:60]
+                        },
+                    )  # V1ObjectMeta
+
+        v1_job_spec_args = {
+            "backoff_limit": 0,
+            "template": client.V1PodTemplateSpec(metadata=v1_job_metadata, spec=v1_pod_spec)
+        }
+
+        # If specified, CFS session jobs set their ttlSecondsAfterFinished based on the CFS session TTL option
+        session_ttl_seconds = _get_ttl_seconds(options.session_ttl)
+        if session_ttl_seconds:
+            LOGGER.debug("session_ttl_seconds = %d", session_ttl_seconds)
+            v1_job_spec_args["ttl_seconds_after_finished"] = session_ttl_seconds
+
+        v1_job = client.V1Job(
+            api_version='batch/v1',
+            kind='Job',
+            metadata=client.V1ObjectMeta(
+                name=job_id,
+            ),
+            spec=client.V1JobSpec(**v1_job_spec_args)
+        )
 
         try:
             job = k8sjobs.create_namespaced_job(self.env['RESOURCE_NAMESPACE'], v1_job)
@@ -618,3 +627,27 @@ class CFSSessionController:
         except ApiException as err:
             LOGGER.error("Unable to create Job=%s: %s", job_id, err)
             # TODO: fixme - transition CFS to error state?
+
+# Valid units are minutes, hours, days, weeks
+_ttl_unit_multiplier = {
+    "m": 60,    # 60 seconds per minute
+    "h": 3600,  # 60*60 = 3600 seconds per hours
+    "d": 86400, # 3600 * 24 = 86400 seconds per day
+    "w": 604800 # 86400 * 7 = 604800 seconds per week
+}
+
+def _get_ttl_seconds(session_ttl: str) -> int:
+    """
+    Returns the CFS session_ttl option in seconds, as an int.
+    Returns 0 if option is not set or if it is invalid.
+    """
+    if not session_ttl:
+        return 0
+    try:
+        ttl_number = int(options.session_ttl[:-1])
+        ttl_units = options.session_ttl[-1].lower()
+        # Valid units are minutes, hours, days, weeks
+        return ttl_number * _ttl_unit_multiplier[ttl_units]
+    except Exception:
+        LOGGER.exception("Invalid value for session_ttl option: %s", session_ttl)
+    return 0
