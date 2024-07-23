@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- When creating Kubernetes jobs for CFS sessions, if the CFS session TTL option is set,
+  use it to set the `ttl_seconds_after_finished` option for the Kubernetes job.
+
 ## [1.22.3] - 06/04/2024
 ### Changed
 - When building unstable charts, have them point to the corresponding unstable cfs-operator images
