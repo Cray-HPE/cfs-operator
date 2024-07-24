@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.26.1] - 07/24/2024
+### Dependencies
+- Bumped dependency versions to resolve CVEs:
+| Package                  | From       | To        |
+|--------------------------|------------|-----------|
+| `certifi`                | 2018.11.29 | 2023.7.22 |
+| `cryptography`           | 41.0.2     | 42.0.8    |
+
 ## [1.26.0] - 07/24/2024
 ### Changed
 - When creating Kubernetes jobs for CFS sessions, if the CFS session TTL option is set,
