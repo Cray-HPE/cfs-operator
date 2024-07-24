@@ -6,8 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.17.4] - 7/24/2024
 ### Changed
 - When building unstable charts, have them point to the corresponding unstable cfs-operator images
+- When creating Kubernetes jobs for CFS sessions, if the CFS session TTL option is set,
+  use it to set the `ttl_seconds_after_finished` option for the Kubernetes job.
+
+### Fixed
+- Fixed job labels that were longer than allowed by Kubernetes
 
 ## [1.17.3] - 7/20/2023
 ### Dependencies
