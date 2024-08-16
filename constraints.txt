@@ -17,7 +17,7 @@ Jinja2==2.10.3
 kafka-python==2.0.2
 # CSM 1.6 uses Kubernetes 1.22, so use client v22.x to ensure compatability
 kubernetes==22.6.0
-liveness==0.0.0-liveness
+liveness>=1.4,<1.5
 MarkupSafe==1.1.1
 mccabe==0.6.1
 more-itertools==7.0.0
