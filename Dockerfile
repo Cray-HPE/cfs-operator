@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2022, 2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -32,16 +32,17 @@ RUN apk add --upgrade --no-cache apk-tools busybox && \
 ADD constraints.txt requirements.txt /app/
 RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
     pip3 install --no-cache-dir -U wheel && \
-    pip3 install --no-cache-dir -r requirements.txt
+    pip3 install --no-cache-dir -r requirements.txt && \
+    pip3 list --format freeze
 COPY src/ /app/lib
 COPY .version /app/lib/
-RUN cd /app/lib && pip3 install --no-cache-dir .
+RUN cd /app/lib && pip3 install --no-cache-dir . && pip3 list --format freeze
 RUN chmod 755 $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/cray/cfs/clone/askpass.py
 
 # Nox Environment
 FROM base as nox
 COPY requirements-dev.txt noxfile.py /app/
-RUN pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt
+RUN pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt && pip3 list --format freeze
 
 # Unit testing
 FROM nox as testing
