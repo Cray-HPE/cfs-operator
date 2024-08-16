@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.26.2] - 08/16/2024
 ### Changed
 - Print list of installed Python modules after pip installs in Dockerfile, for logging purposes.
 
