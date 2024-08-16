@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Instead of using `update_external_versions` to find the latest patch version of
 liveness, instead just pin the major/minor number directly in constraints.txt.
 - Use `requests_retry_session` module instead of duplicating code.
+- Add missing required modules to requirements.txt
 
 ## [1.22.4] - 07/24/2024
 ### Changed
