@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022, 2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,9 +26,6 @@ import logging
 from requests_retry_session import requests_retry_session as base_requests_retry_session
 
 PROTOCOL = 'http'
-API_VERSION = 'v2'
-SERVICE_NAME = 'cray-cfs-api'
-ENDPOINT = "%s://%s/%s" % (PROTOCOL, SERVICE_NAME, API_VERSION)
 
 LOGGER = logging.getLogger(__name__)
 
