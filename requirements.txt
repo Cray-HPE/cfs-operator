@@ -7,3 +7,4 @@ paramiko
 redis
 liveness
 kafka-python
+requests-retry-session
