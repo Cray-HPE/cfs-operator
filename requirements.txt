@@ -2,11 +2,15 @@
 --extra-index-url http://artifactory.algol60.net/artifactory/csm-python-modules/simple
 -c constraints.txt
 dictdiffer
-kubernetes
-paramiko
-redis
-liveness
-kafka-python
-ujson
-hvac
 gitpython
+hvac
+kafka-python
+kubernetes
+liveness
+paramiko
+PyYAML
+redis
+requests
+requests-retry-session
+ujson
+urllib3
