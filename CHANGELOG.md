@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Print list of installed Python modules after pip installs in Dockerfile, for logging purposes.
+
 ### Dependencies
 - Instead of using `update_external_versions` to find the latest patch version of
 liveness, instead just pin the major/minor number directly in constraints.txt.
