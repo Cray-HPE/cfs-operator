@@ -10,3 +10,4 @@ kafka-python
 ujson
 hvac
 gitpython
+requests-retry-session
