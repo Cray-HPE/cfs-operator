@@ -16,7 +16,7 @@ idna==2.8
 Jinja2==2.10.3
 kafka-python==2.0.2
 kubernetes==9.0.1
-liveness==0.0.0-liveness
+liveness>=1.4,<1.5
 MarkupSafe==1.1.1
 mccabe==0.6.1
 more-itertools==7.0.0
