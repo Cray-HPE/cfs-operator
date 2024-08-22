@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Dependencies
+- CASMCMS-9115: Move to `ansible-execution-environment` 1.17
 
 ## [1.26.2] - 08/16/2024
 ### Changed
@@ -13,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Dependencies
 - Instead of using `update_external_versions` to find the latest patch version of
-liveness, instead just pin the major/minor number directly in constraints.txt.
+  liveness, instead just pin the major/minor number directly in constraints.txt.
 - Use `requests_retry_session` module instead of duplicating code.
 - Add missing required modules to requirements.txt
 
