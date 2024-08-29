@@ -34,7 +34,7 @@ sources:
 - https://github.com/Cray-HPE/ansible-execution-environment
 dependencies:
 - name: cray-service
-  version: ^7.0.0
+  version: ~11.0.0
   repository: https://artifactory.algol60.net/artifactory/csm-helm-charts/
 maintainers:
 - name: rbak-hpe
