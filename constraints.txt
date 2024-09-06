@@ -8,7 +8,7 @@ cffi==1.14.6
 chardet==3.0.4
 colorlog==3.2.0
 coverage==4.5.4
-cryptography==42.0.8
+cryptography>=43.0.1,<43.1
 dictdiffer==0.8.1
 flake8==3.6.0
 google-auth==1.6.3
