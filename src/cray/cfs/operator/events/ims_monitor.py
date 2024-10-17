@@ -52,6 +52,8 @@ class IMSJobMonitor:
     @staticmethod
     def _get_running_ims_jobs():
         jobs = get_ims_jobs()
+        for job in jobs:
+            LOGGER.info(f"Job: {job.get("id")}, status: {job.get("status")}")
         return [job["id"] for job in jobs if job.get("status") not in ["success", "error"]]
 
     @staticmethod
