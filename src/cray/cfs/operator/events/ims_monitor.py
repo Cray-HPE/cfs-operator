@@ -47,7 +47,7 @@ class IMSJobMonitor:
                     self._cleanup_orphaned_ims_jobs(jobs)
             except Exception as e:
                 LOGGER.warning('Exception during IMS session cleanup: {}'.format(e))
-            time.sleep(60)
+            time.sleep(10)
 
     @staticmethod
     def _get_running_ims_jobs():
@@ -60,7 +60,9 @@ class IMSJobMonitor:
         for session in cfs_sessions.iter_sessions(parameters={"status": "complete"}):
             try:
                 ims_job_id = session.get("status", {}).get("session", {}).get("ims_job")
+                LOGGER.info(f"Checking session: {session.get("name")}, with ims job: {ims_job_id}")
                 if ims_job_id and ims_job_id in ims_jobs:
+                    LOGGER.info(f"  Deleting ims job: {ims_job_id}")
                     delete_ims_job(ims_job_id)
             except Exception as e:
                 error = e
