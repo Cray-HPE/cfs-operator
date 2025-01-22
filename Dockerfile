@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022, 2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2022, 2024-2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -27,7 +27,7 @@ WORKDIR /app
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
 RUN apk add --upgrade --no-cache apk-tools busybox && \
 	apk update && \
-    apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash git && \
+    apk add --no-cache gcc musl-dev openssh-client libffi-dev openssl-dev python3-dev py3-pip make curl bash git && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
 RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
