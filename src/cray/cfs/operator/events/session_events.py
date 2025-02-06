@@ -270,13 +270,13 @@ class CFSSessionController:
             value=str(os.environ.get("VAULT_ADDR", ""))
         )
         try:
-            self._set_vault_token()
+            self._set_vault_token(session_data)
         except MultitenantException as mte:
             LOGGER.warning("Unable to set VAULT_TOKEN for job: %s; skipping, but could cause failed configuration session.",
                            mte)
 
 
-    def _set_vault_token(self):
+    def _set_vault_token(self, session_data):
         """
         When a new CFS Session is created, check to see if the session is being initialized against a configuration
         that it is owned by a specific tenant. If it is owned by a tenant, we need to pass in the unlock token
