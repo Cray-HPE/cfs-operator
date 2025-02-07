@@ -282,6 +282,7 @@ class CFSSessionController:
         that it is owned by a specific tenant. If it is owned by a tenant, we need to pass in the unlock token
         that is required for SOPS to decrypt any encrypted variables.
         """
+        LOGGER.info("Session Data: %s", session_data)
         cfs_configuration_name = session_data['ansible']['config']
         try:
             configuration_data = get_configuration(cfs_configuration_name)
