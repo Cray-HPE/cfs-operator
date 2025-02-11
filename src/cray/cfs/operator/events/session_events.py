@@ -274,6 +274,7 @@ class CFSSessionController:
         except MultitenantException as mte:
             LOGGER.warning("Unable to set VAULT_TOKEN for job: %s; skipping, but could cause failed configuration session.",
                            mte)
+            raise MultitenantException("IT BROKE!") from mte
 
 
     def _set_vault_token(self, session_data):
