@@ -316,7 +316,7 @@ class CFSSessionController:
             # Now that we have the access token for the user, we can use it to login to vault
             vault_login_uri = 'http://cray-vault.vault.svc:8200/v1/auth/kubernetes/login'
             try:
-                vault_response = requestes.put(vault_login_uri, data={'jwt': access_token, 'role': transit_engine}).json()
+                vault_response = requests.put(vault_login_uri, data={'jwt': access_token, 'role': transit_engine}).json()
             except Exception as exception:
                 raise VaultException("Unable to login to complete PUT to Vault Login.") from exception
             LOGGER.info("Vault Response: %s", vault_response)
