@@ -269,15 +269,8 @@ class CFSSessionController:
             name='VAULT_ADDR',
             value=str(os.environ.get("VAULT_ADDR", ""))
         )
-        try:
-            self._set_vault_token(session_data)
-        except MultitenantException as mte:
-            LOGGER.warning("Unable to set VAULT_TOKEN for job: %s; skipping, but could cause failed configuration session.",
-                           mte)
-            raise MultitenantException("IT BROKE!") from mte
 
-
-    def _set_vault_token(self, session_data):
+    def _lookup_vault_token(self, session_data):
         """
         When a new CFS Session is created, check to see if the session is being initialized against a configuration
         that it is owned by a specific tenant. If it is owned by a tenant, we need to pass in the unlock token
@@ -325,10 +318,7 @@ class CFSSessionController:
                 raise VaultException("Unable to login to complete PUT to Vault Login.") from exception
             vault_token = vault_response['auth']['client_token']
             # Finally, with a tenant's vault token in hand, we can append it to the job launch's variables
-            self._job_env['VAULT_TOKEN'] = client.V1EnvVar(
-                name='VAULT_TOKEN',
-                value=vault_token
-            )
+            return vault_token
 
     def _set_volume_mounts(self):
         """
@@ -543,6 +533,15 @@ class CFSSessionController:
         if session_data["debug_on_failure"]:
             debug_wait_time = options.debug_wait_time
 
+        # Lookup any vault token necessary to decrypt SOPS variables when running ansible
+        try:
+            vault_token_env = client.V1EnvVar(name='VAULT_TOKEN', value=self._lookup_vault_token(session_data) or '')
+        except MultitenantException as mte:
+            LOGGER.warning("Unable to set VAULT_TOKEN for job: %s; skipping, but could cause failed configuration session.",
+                           mte)
+            # Zero it out, indicating we couldn't look it up, but we tried.
+            vault_token_env = client.V1EnvVar(name="VAULT_TOKEN", value='')
+
         ansible_container = client.V1Container(
             name='ansible',
             image=self.env['CRAY_CFS_AEE_IMAGE'],
@@ -567,7 +566,8 @@ class CFSSessionController:
                 client.V1EnvVar(
                     name='DEBUG_WAIT_TIME',
                     value=str(debug_wait_time)
-                )
+                ),
+                vault_token_env
             ],  # env
             volume_mounts=[
                 self._job_volume_mounts['CONFIG_VOL'],
