@@ -282,8 +282,10 @@ class CFSSessionController:
         that it is owned by a specific tenant. If it is owned by a tenant, we need to pass in the unlock token
         that is required for SOPS to decrypt any encrypted variables.
         """
-        LOGGER.info("Session Data: %s", session_data)
-        cfs_configuration_name = session_data['ansible']['config']
+        #LOGGER.info("Session Data: %s", session_data)
+        # {'ansible': {'config': 'cfs-default-ansible-cfg', 'limit': None, 'passthrough': None, 'verbosity': 0},
+        # 'configuration': {'limit': '', 'name': 'sleep_blue'}, 'debug_on_failure': False, 'logs': None, 'name': 'sleepblue', 'status': {'artifacts': [], 'session': {'completion_time': None, 'ims_job': None, 'job': 'cfs-9037b0fa-0084-47bc-95b5-6d8993c99f38', 'start_time': '2025-02-11T17:13:42', 'status': 'pending', 'succeeded': 'none'}}, 'tags': {}, 'target': {'definition': 'dynamic', 'groups': [], 'image_map': []}}
+        cfs_configuration_name = session_data['configuration']['name']
         try:
             configuration_data = get_configuration(cfs_configuration_name)
         except Exception as exception:
