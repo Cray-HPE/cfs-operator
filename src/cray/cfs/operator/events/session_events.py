@@ -541,6 +541,7 @@ class CFSSessionController:
                            mte)
             # Zero it out, indicating we couldn't look it up, but we tried.
             vault_token_env = client.V1EnvVar(name="VAULT_TOKEN", value='')
+            raise MultitenantException("BROKEN, WHY?") from mte
 
         ansible_container = client.V1Container(
             name='ansible',
