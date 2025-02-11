@@ -285,6 +285,7 @@ class CFSSessionController:
         except Exception as exception:
             raise CFSApiException("Unable to obtain configuration information from CFS API.") from exception
         tenant = tenant_namespace = configuration_data.get('tenant_name', None)
+        LOGGER.info("Tenant: %s", tenant)
         if tenant:
             # Once we know there is a tenant associated with it, we need to ask TAPMS about that tenant's transit engine
             try:
@@ -296,6 +297,7 @@ class CFSSessionController:
             except Exception as exception:
                 raise TapmsException("Unable to get namespaced CRD information from TAPMS") from exception
             transit_engine = tapms_response['status']['tenantkms']['transitname']
+            LOGGER.info("Transit Engine: %s", transit_engine)
             # Now, we must read the secret that is associated with the tenant from its' namespace so that we can
             # use it to authenticate to vault. Unfortunately, the name isn't pre-determined, but there should only be
             # exactly one of them, so we must first list all of the defined secrets, and then reference the only one
@@ -310,12 +312,14 @@ class CFSSessionController:
                 raise K8sException("Exactly one secret within tenant namespace '%s' expected; instead found %s."
                                      %(tenant_namespace, secrets_within_tenant))
             access_token = base64.b64decode(tenant_namespaced_secrets_list[0]['data']['token']).decode('ascii')
+            LOGGER.info("Access Token: %s", access_token)
             # Now that we have the access token for the user, we can use it to login to vault
             vault_login_uri = 'http://cray-vault.vault.svc:8200/v1/auth/kubernetes/login'
             try:
                 vault_response = requestes.put(vault_login_uri, data={'jwt': access_token, 'role': transit_engine}).json()
             except Exception as exception:
                 raise VaultException("Unable to login to complete PUT to Vault Login.") from exception
+            LOGGER.info("Vault Response: %s", vault_response)
             vault_token = vault_response['auth']['client_token']
             # Finally, with a tenant's vault token in hand, we can append it to the job launch's variables
             return vault_token
