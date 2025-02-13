@@ -21,7 +21,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.15
+ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.18
 FROM ${BASE_CONTAINER} as base
 WORKDIR /app
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
