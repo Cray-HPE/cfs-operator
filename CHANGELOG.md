@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.29.0] - 02/13/2025
 ### Dependencies
-- CASMCMS-9282: Bump Alpine version from 3.15 to 3.18, because 3.15 no longer receives security patches
+- CASMCMS-9282: Bump Alpine version from 3.15 to 3.21, because 3.15 no longer receives security patches;
+  Use Python venv inside Docker image.
 
 ## [1.28.0] - 01/22/2025
 ### Changed
