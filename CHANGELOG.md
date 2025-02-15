@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Updated cfs-api clusterrole definition to allow it to introspect into tenant namespaces for access to secrets
+### Added
+- Allow session_events to perform VAULT_TOKEN lookups when associated with a configset owned by a tenant
 
 ## [1.28.0] - 01/22/2025
 ### Changed
