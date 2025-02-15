@@ -530,7 +530,7 @@ class CFSSessionController:
         if session_data["debug_on_failure"]:
             debug_wait_time = options.debug_wait_time
 
-        # Lookup any vault token necessary to decrypt SOPS variables when running ansible
+        # Look up any vault token necessary to decrypt SOPS variables when running Ansible
         try:
             vault_token_env = client.V1EnvVar(name='VAULT_TOKEN', value=self._lookup_vault_token(session_data) or '')
         except MultitenantException as mte:
