@@ -304,7 +304,7 @@ class CFSSessionController:
             # There _should_ be exactly one. If there is any other number, we shouldn't assume.
             secrets_within_tenant = len(tenant_namespaced_secrets_list)
             if secrets_within_tenant != 1:
-                raise K8sException("Exactly one secret within tenant namespace '%s' expected; instead found %s."
+                raise K8sException("Exactly one secret within tenant namespace '%s' expected; instead found %d."
                                      %(tenant_namespace, secrets_within_tenant))
             access_token = base64.b64decode(tenant_namespaced_secrets_list[0]['data']['token']).decode('ascii')
             # Now that we have the access token for the user, we can use it to login to vault
