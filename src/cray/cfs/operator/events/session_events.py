@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,6 +31,8 @@ import shlex
 import time
 import threading
 import uuid
+import base64
+import requests
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -57,6 +59,37 @@ except ConfigException:  # pragma: no cover
 
 _api_client = client.ApiClient()
 k8sjobs = client.BatchV1Api(_api_client)
+CRD_CLIENT = client.CustomObjectsApi()
+CORE_CLIENT = client.CoreV1Api()
+
+
+class MultitenantException(Exception):
+    """
+    While working with a microservice required for establishing a KV Store for multitenancy, something unexpected
+    happened.
+    """
+
+class CFSApiException(MultitenantException):
+    """
+    When the CFS API is unable to return information in a timely manner.
+    """
+
+
+class TapmsException(MultitenantException):
+    """
+    There was an error while inquiring about the tenant associated with a configuration.
+    """
+
+class K8sException(MultitenantException):
+    """
+    When looking up information from k8s for multitenancy where k8s doesn't behave as expected.
+    """
+
+class VaultException(MultitenantException):
+    """
+    There was an error while interacting with the vault instance.
+    """
+
 
 # Boilerplate code to wait for the envoy sidecar to open connections to the
 # mesh. Calls within pods prior to this completing will fail with connection
@@ -236,6 +269,53 @@ class CFSSessionController:
             name='VAULT_ADDR',
             value=str(os.environ.get("VAULT_ADDR", ""))
         )
+
+    def _lookup_vault_token(self, session_data):
+        """
+        When a new CFS Session is created, check to see if the session is being initialized against a configuration
+        that it is owned by a specific tenant. If it is owned by a tenant, we need to pass in the unlock token
+        that is required for SOPS to decrypt any encrypted variables.
+        """
+        cfs_configuration_name = session_data['configuration']['name']
+        try:
+            configuration_data = get_configuration(cfs_configuration_name)
+        except Exception as exception:
+            raise CFSApiException("Unable to obtain configuration information from CFS API.") from exception
+        tenant = tenant_namespace = configuration_data.get('tenant_name', None)
+        if tenant:
+            # Once we know there is a tenant associated with it, we need to ask TAPMS about that tenant's transit engine
+            try:
+                tapms_response = CRD_CLIENT.get_namespaced_custom_object(group='tapms.hpe.com',
+                                                                         version='v1alpha3',
+                                                                         namespace='tenants',
+                                                                         plural='tenants',
+                                                                         name=tenant)
+            except Exception as exception:
+                raise TapmsException("Unable to get namespaced CRD information from TAPMS") from exception
+            transit_engine = tapms_response['status']['tenantkms']['transitname']
+            # Now, we must read the secret that is associated with the tenant from its' namespace so that we can
+            # use it to authenticate to vault. Unfortunately, the name isn't pre-determined, but there should only be
+            # exactly one of them, so we must first list all of the defined secrets, and then reference the only one
+            # that exists.
+            try:
+                tenant_namespaced_secrets_list = CORE_CLIENT.list_namespaced_secret(tenant_namespace).to_dict()['items']
+            except Exception as exception:
+                raise K8sException("Unable to list secrets from tenant's namespace.") from exception
+            # There _should_ be exactly one. If there is any other number, we shouldn't assume.
+            secrets_within_tenant = len(tenant_namespaced_secrets_list)
+            if secrets_within_tenant != 1:
+                raise K8sException("Exactly one secret within tenant namespace '%s' expected; instead found %d."
+                                     %(tenant_namespace, secrets_within_tenant))
+            access_token = base64.b64decode(tenant_namespaced_secrets_list[0]['data']['token']).decode('ascii')
+            # Now that we have the access token for the user, we can use it to login to vault
+            vault_login_uri = 'http://cray-vault.vault.svc:8200/v1/auth/kubernetes/login'
+            try:
+                vault_response = requests.put(vault_login_uri, data={'jwt': access_token, 'role': transit_engine}).json()
+            except Exception as exception:
+                raise VaultException("Unable to login to complete PUT to Vault Login.") from exception
+            vault_token = vault_response['auth']['client_token']
+            # Finally, with a tenant's vault token in hand, we can append it to the job launch's variables
+            return vault_token
 
     def _set_volume_mounts(self):
         """
@@ -450,6 +530,15 @@ class CFSSessionController:
         if session_data["debug_on_failure"]:
             debug_wait_time = options.debug_wait_time
 
+        # Look up any vault token necessary to decrypt SOPS variables when running Ansible
+        try:
+            vault_token_env = client.V1EnvVar(name='VAULT_TOKEN', value=self._lookup_vault_token(session_data) or '')
+        except MultitenantException as mte:
+            LOGGER.warning("Unable to set VAULT_TOKEN for job: %s; skipping, but could cause failed configuration session.",
+                           mte)
+            # Zero it out, indicating we couldn't look it up, but we tried.
+            vault_token_env = client.V1EnvVar(name="VAULT_TOKEN", value='')
+
         ansible_container = client.V1Container(
             name='ansible',
             image=self.env['CRAY_CFS_AEE_IMAGE'],
@@ -474,7 +563,8 @@ class CFSSessionController:
                 client.V1EnvVar(
                     name='DEBUG_WAIT_TIME',
                     value=str(debug_wait_time)
-                )
+                ),
+                vault_token_env
             ],  # env
             volume_mounts=[
                 self._job_volume_mounts['CONFIG_VOL'],
