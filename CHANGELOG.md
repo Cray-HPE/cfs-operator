@@ -6,10 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.29.0] - 02/13/2025
 ### Changed
 - Updated cfs-api clusterrole definition to allow it to introspect into tenant namespaces for access to secrets
+
 ### Added
 - Allow session_events to perform VAULT_TOKEN lookups when associated with a configset owned by a tenant
+
+### Dependencies
+- CASMCMS-9282
+  - Bump Alpine version from 3.15 to 3.21, because 3.15 no longer receives security patches
+  - Use Python venv inside Docker image.
+  - Update Python dependencies for move to Python 3.12
+  - Update to `cray-aee` 1.18 for CSM 1.7
 
 ## [1.28.0] - 01/22/2025
 ### Changed

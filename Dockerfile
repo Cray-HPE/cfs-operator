@@ -21,28 +21,35 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.15
+ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.21
 FROM ${BASE_CONTAINER} as base
 WORKDIR /app
+ENV VIRTUAL_ENV=/app/venv
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
 RUN apk add --upgrade --no-cache apk-tools busybox && \
-	apk update && \
-    apk add --no-cache gcc musl-dev openssh-client libffi-dev openssl-dev python3-dev py3-pip make curl bash git && \
-    apk -U upgrade --no-cache
+    apk update && \
+    apk add --no-cache gcc musl-dev openssh-client libffi-dev openssl-dev python3 python3-dev py3-pip make curl bash git && \
+    apk -U upgrade --no-cache && \
+    python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ADD constraints.txt requirements.txt /app/
-RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
-    pip3 install --no-cache-dir -U wheel && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    pip3 list --format freeze
 COPY src/ /app/lib
 COPY .version /app/lib/
-RUN cd /app/lib && pip3 install --no-cache-dir . && pip3 list --format freeze
-RUN chmod 755 $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/cray/cfs/clone/askpass.py
+RUN --mount=type=secret,id=netrc,target=/root/.netrc \
+    pip3 install --no-cache-dir -U pip -c constraints.txt && \
+    pip3 install --no-cache-dir --disable-pip-version-check -U wheel -c constraints.txt && \
+    pip3 install --no-cache-dir --disable-pip-version-check -r requirements.txt && \
+    pip3 list --format freeze && \
+    cd /app/lib && \
+    pip3 install --no-cache-dir --disable-pip-version-check . -c /app/constraints.txt && \
+    pip3 list --format freeze && \
+    chmod 755 $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/cray/cfs/clone/askpass.py
 
 # Nox Environment
 FROM base as nox
 COPY requirements-dev.txt noxfile.py /app/
-RUN pip3 install --ignore-installed distlib --no-cache-dir -r /app/requirements-dev.txt && pip3 list --format freeze
+RUN pip3 install --ignore-installed distlib --no-cache-dir --disable-pip-version-check -r /app/requirements-dev.txt && \
+    pip3 list --format freeze
 
 # Unit testing
 FROM nox as testing
