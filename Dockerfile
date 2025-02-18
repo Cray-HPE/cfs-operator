@@ -22,7 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 ARG BASE_CONTAINER=artifactory.algol60.net/docker.io/alpine:3.21
-FROM ${BASE_CONTAINER} as base
+FROM ${BASE_CONTAINER} AS base
 WORKDIR /app
 ENV VIRTUAL_ENV=/app/venv
 # Upgrade apk-tools and busybox to avoid Snyk-detected security issues
@@ -46,26 +46,26 @@ RUN --mount=type=secret,id=netrc,target=/root/.netrc \
     chmod 755 $(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")/cray/cfs/clone/askpass.py
 
 # Nox Environment
-FROM base as nox
+FROM base AS nox
 COPY requirements-dev.txt noxfile.py /app/
 RUN pip3 install --ignore-installed distlib --no-cache-dir --disable-pip-version-check -r /app/requirements-dev.txt && \
     pip3 list --format freeze
 
 # Unit testing
-FROM nox as testing
+FROM nox AS testing
 COPY requirements-test.txt .coveragerc /app/
 COPY tests/unit/ /app/tests/unit/
 ENV BUILDENV=pipeline
 CMD ["nox", "--nocolor", "-s", "unittests"]
 
 # Linting
-FROM testing as lint
+FROM testing AS lint
 COPY requirements-lint.txt .flake8 sonar-project.properties /app/
 ENV BUILDENV=pipeline
 CMD ["nox", "--nocolor", "-s", "lint"]
 
 # Main application - CFS Kubernetes Operator
-FROM base as application
+FROM base AS application
 RUN mkdir -p /inventory
 USER nobody:nobody
 ENTRYPOINT [ "python3", "-m", "cray.cfs.operator" ]
