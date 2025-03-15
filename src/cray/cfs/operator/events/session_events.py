@@ -438,22 +438,38 @@ class CFSSessionController:
 
         return clone_container
 
-    def _get_inventory_container(self, session_data):
-        """
-        Create the inventory container object
-        """
-        create_ssh_dir_cmd = 'mkdir -p {}/ssh '.format(SHARED_DIRECTORY)
-
+    @classmethod
+    def _create_ssh_keys_cmd(cls, target: str):
         # For live nodes, use the signed keys from vault with a cert generated
         # by the CFS trust mechanisms
-        create_ssh_keys_cmd = 'cp /secret-keys/* {0}/ssh/ && ' \
+        create_ssh_keys_cmd = 'rm -f /tmp/secret-keys/* && ' \
+                              'cp /secret-keys/* /tmp/secret-keys/ && ' \
+                              'cp /tmp/secret-keys/* {0}/ssh/ && ' \
                               'chmod 600 {0}/ssh/id_ecdsa && ' \
                               'cp /secret-certs/* {0}/ssh/ '.format(SHARED_DIRECTORY)
 
         # For image customization, generate some keys for use with Ansible
-        if session_data['target']['definition'] == "image":
+        if target == "image":
             create_ssh_keys_cmd += ' && ssh-keygen -t ecdsa -N "" -f {}/ssh/id_image '.format(
                 SHARED_DIRECTORY)
+
+        return create_ssh_keys_cmd
+
+    def _get_inventory_container(self, session_data):
+        """
+        Create the inventory container object
+        """
+        create_ssh_dir_cmd = 'mkdir -p {}/ssh /tmp/secret-keys'.format(SHARED_DIRECTORY)
+
+        # For live nodes, use the signed keys from vault with a cert generated
+        # by the CFS trust mechanisms
+        create_ssh_keys_cmd = self._get_create_ssh_keys_cmd(session_data['target']['definition'])
+
+        updated_keys_cmd = f'while [[ ! -e {SHARED_DIRECTORY}/ansible-complete ]]; do ' \
+                            'sleep 15; ' \
+                            'if ! diff -qr /secret-keys /tmp/secret-keys; then ' \
+                              f'echo "Updating keys"; {create_ssh_dir_cmd}; ' \
+                            f'fi; done; echo "{SHARED_DIRECTORY}/ansible-complete exists, exiting"'
 
         copy_ansible_cfg_cmd = 'cp /tmp/ansible/ansible.cfg {}/ '.format(SHARED_DIRECTORY)
         run_inventory_cmd = 'python3 -m cray.cfs.inventory'
@@ -462,7 +478,8 @@ class CFSSessionController:
             create_ssh_keys_cmd + ' && ' +
             copy_ansible_cfg_cmd + ' && ' +
             wait_for_envoy_boilerplate + ' && ' +
-            run_inventory_cmd
+            run_inventory_cmd + ' && ' +
+            updated_keys_cmd
         ]
 
         return client.V1Container(
