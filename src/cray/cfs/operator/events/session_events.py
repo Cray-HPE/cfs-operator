@@ -124,6 +124,7 @@ class CFSSessionController:
                 LOGGER.warning('Exception handling kafka event: {}'.format(e))
 
     def _handle_event(self, event, kafka):
+        event_type = None
         try:
             event_type = event.get('type')
             event_data = event.get('data')
@@ -139,7 +140,9 @@ class CFSSessionController:
                 LOGGER.warning('Invalid event type detected: {}'.format(event))
         except Exception as e:
             LOGGER.error("EVENT: Exception while handling cfs-operator event: {}".format(e))
-            if "404 Client Error" not in str(e):
+            # CASMCMS-9335: Retry the event if it is a 404 error during create event. This is to handle
+            # the case where the session is created but is yet to appear in DB and an update to session is issued.
+            if "404 Client Error" not in str(e) or (event_type == 'CREATE' and "404 Client Error" in str(e)):
                 # 404 errors are usually deleted sessions and won't recover
                 self._send_retry(event, kafka)
         kafka.consumer.commit()

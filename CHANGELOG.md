@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.30.0] - 04/24/2025
+### Fixed
+- CASMCMS-9335: cfs session patch fails to update Job ID causing session to remain in pending state.
+
 ## [1.29.0] - 02/13/2025
 ### Changed
 - Updated cfs-api clusterrole definition to allow it to introspect into tenant namespaces for access to secrets
