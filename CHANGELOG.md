@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.32.0] - 06/26/2025
 ### Dependencies
 - CASMCMS-9459: Updated `aee` version to 1.19.0. It has python module updates.
 
