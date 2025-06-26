@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- CASMCMS-9459: Updated `aee` version to 1.19.0. It has python module updates.
+
 ## [1.31.0] - 06/05/2025
 ### Fixed
 - CASMCMS-9452: Cleanup of leftover Cluster/RoleBindings under CMS
