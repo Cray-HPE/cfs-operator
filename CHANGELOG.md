@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- CASMCMS-9466: Reverting back python module updates made in tag `aee``1.19.0` to resolve ansible-core dependency issues with target.
+
 ## [1.32.0] - 06/26/2025
 ### Dependencies
 - CASMCMS-9459: Updated `aee` version to 1.19.0. It has python module updates.
