@@ -51,6 +51,7 @@ DEFAULT_ANSIBLE_CONFIG = 'cfs-default-ansible-cfg'
 DEFAULT_ANSIBLE_VERBOSITY = 0
 SHARED_DIRECTORY = '/inventory'
 VCS_USER_CREDENTIALS_DIR = '/etc/cray/vcs'
+CAINFO_PATH = '/etc/cray/ca/certificate_authority.crt'
 
 try:
     config.load_incluster_config()
@@ -214,7 +215,7 @@ class CFSSessionController:
         self._job_env = {}
         self._job_env['GIT_SSL_CAINFO'] = client.V1EnvVar(
             name='GIT_SSL_CAINFO',
-            value='/etc/cray/ca/certificate_authority.crt'
+            value=CAINFO_PATH
         )
         self._job_env['CFS_OPERATOR_LOG_LEVEL'] = client.V1EnvVar(
             name='CFS_OPERATOR_LOG_LEVEL',
@@ -238,7 +239,7 @@ class CFSSessionController:
         )
         self._job_env['SSL_CAINFO'] = client.V1EnvVar(
             name='SSL_CAINFO',
-            value='/etc/cray/ca/certificate_authority.crt'
+            value=CAINFO_PATH
         )
         self._job_env['VCS_USERNAME'] = client.V1EnvVar(
             name='VCS_USERNAME',
@@ -551,6 +552,7 @@ class CFSSessionController:
             ),
             env=[
                 self._job_env['SESSION_NAME'],
+                self._job_env['SSL_CAINFO'],
                 client.V1EnvVar(
                     name='ANSIBLE_ARGS',
                     value=" ".join(ansible_args)
@@ -567,10 +569,15 @@ class CFSSessionController:
                     name='DEBUG_WAIT_TIME',
                     value=str(debug_wait_time)
                 ),
+                client.V1EnvVar(
+                    name='REQUESTS_CA_BUNDLE',
+                    value=CAINFO_PATH
+                ),
                 vault_token_env
             ],  # env
             volume_mounts=[
                 self._job_volume_mounts['CONFIG_VOL'],
+                self._job_volume_mounts['CA_PUBKEY'],
             ],  # volume_mounts
             args=[json.dumps(ansible_data)],
         )  # V1Container
