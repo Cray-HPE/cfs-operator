@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- CASMCMS-9474: Mount CA certs into ansible container
+
 ### Dependencies
 - Update `kubernetes` and `requests-retry-session` versions; constrain packages that previously were not constrained
 
