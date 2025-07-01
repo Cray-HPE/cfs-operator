@@ -12,5 +12,7 @@ PyYAML
 redis
 requests
 requests-retry-session
+# setuptools is needed for distutils command run in Dockerfile
+setuptools
 ujson
 urllib3

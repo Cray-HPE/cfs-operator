@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.0] - 07/01/2025
+
+### Changed
+- CASMCMS-9474: Mount CA certs into ansible container
+
+### Dependencies
+- Update `kubernetes` and `requests-retry-session` versions; constrain packages that previously were not constrained
+
 ## [1.33.0] - 06/27/2025
 ### Dependencies
 - CASMCMS-9466: Reverting back python module updates made in tag `aee` `1.19.0` to resolve `ansible-core` dependency issues with target.
