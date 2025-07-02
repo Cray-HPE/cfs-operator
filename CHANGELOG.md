@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.1] - 07/02/2025
+
 ### Dependencies
 - CASMCMS-9468: Specify different `requests-retry-session` version based on Python version
 
