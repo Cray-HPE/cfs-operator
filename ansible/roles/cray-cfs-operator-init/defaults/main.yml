@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019, 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019, 2021-2022, 2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -57,7 +57,7 @@ cray_cfs_ims_image:  "{{ cray_stack_registry_source }}/{{ cray_cfs_ims_image_org
 # Image for storing CFSession target results
 cray_cfs_redis_image_org: library
 cray_cfs_redis_image_name: redis
-cray_cfs_redis_image_version: 5.0-alpine
+cray_cfs_redis_image_version: 7.2-alpine
 cray_cfs_redis_image: "{{ cray_stack_registry_source }}/{{ cray_cfs_redis_image_org }}/{{ cray_cfs_redis_image_name }}:{{ cray_cfs_redis_image_version }}"
 
 # Ansible Execution Environment image

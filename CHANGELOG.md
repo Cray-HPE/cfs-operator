@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- CASMCMS-9599: Update Redis versions to match actual Redis versions used by CFS
+
 ## [1.34.1] - 07/02/2025
 
 ### Dependencies
