@@ -4,12 +4,12 @@ attrs==19.1.0
 bcrypt==3.1.7
 cachetools>=5.3.3,<5.4
 certifi==2023.7.22
-cffi==1.14.6
+cffi>=2.0,<2.1
 chardet==3.0.4
 charset-normalizer>=3.4.2,<3.5
 colorlog==3.2.0
 coverage==4.5.4
-cryptography>=43.0.1,<43.1
+cryptography>=46.0.5,<46.1
 dictdiffer==0.8.1
 flake8==3.6.0
 gitdb==4.0.12
@@ -30,8 +30,8 @@ oauthlib>=3.2.2,<3.3
 paramiko==2.11.1
 pluggy==0.8.1
 py==1.8.2
-pyasn1==0.4.8
-pyasn1-modules==0.2.8
+pyasn1>=0.6.2,<0.7
+pyasn1-modules>=0.4,<0.5
 pycodestyle==2.4.0
 pycparser>=2.19,<2.20
 pyflakes==2.0.0
@@ -54,7 +54,7 @@ setuptools>=80.9.0,<80.10
 six>=1.17.0,<1.18
 smmap>=5.0.2
 ujson==5.8.0
-urllib3>=1.26,<1.27
+urllib3>=2.6.3,<2.7
 virtualenv==15.2.0
 websocket-client>=1.5.3,<1.6
 wheel>=0.45.1,<0.46

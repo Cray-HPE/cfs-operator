@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- Updated Python module versions to resolve CVEs:
+    - Modules:
+        - `cffs` 1.14 -> 2.0
+        - `cryptography` 43.0 -> 46.0
+        - `pyasn1` 0.4 -> 0.6
+        - `pyasn1-modules` 0.2 -> 0.4
+        - `urllib3` 1.26 -> 2.6
+    - Resolves:
+        - https://snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-15263096
+        - https://snyk.io/vuln/SNYK-PYTHON-PYASN1-15032639
+        - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14896210
+        - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192443
+        - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192442
+
 ## [1.34.2] - 11/26/2025
 
 ### Dependencies
