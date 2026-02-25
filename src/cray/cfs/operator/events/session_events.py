@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2025 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,6 @@
 """
 Functions for handling CFS Session Events
 """
-import ujson as json
 import logging
 import os
 import shlex
@@ -32,11 +31,13 @@ import time
 import threading
 import uuid
 import base64
-import requests
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from kubernetes.config.config_exception import ConfigException
+import requests
+from requests.exceptions import HTTPError
+import ujson as json
 
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.operator.cfs.options import options
@@ -139,12 +140,53 @@ class CFSSessionController:
                 self._handle_deleted(event_data)
             else:
                 LOGGER.warning('Invalid event type detected: {}'.format(event))
+        except HTTPError as e:
+            LOGGER.error("EVENT: HTTP %d error while handling cfs-operator event: %s",
+                         e.response.status_code, e)
+            try:
+                LOGGER.debug("Error detail: %s", e.response.json()["detail"])
+            except Exception as e2:
+                LOGGER.debug("%s exception trying to get error details: %s",
+                             type(e2).__name__, e2)
+            # CASMCMS-9335 / CASMCMS-9627
+            # Retry on most HTTP errors
+            #
+            # Specifically:
+            # - for CREATE events, we retry on any HTTP failure except 409. If we get a
+            # 409 during a CREATE event, it means we are trying to set the Kubernetes job
+            # field when it has already been set. Thus, we should not retry, to avoid creating
+            # a second Kubernetes job for the same CFS session.
+            # - for non-CREATE events, we retry HTTP failures except 404s. This is because outside
+            # of CREATE events, 404 errors are usually deleted sessions that won't recover; for
+            # CREATE events, a 404 more likely means that the session is created but is yet to
+            # appear in the DB.
+
+            # Retry if this is not a CREATE event and the status code is not 404
+            if event_type != 'CREATE':
+                if e.response.status_code != 404:
+                    self._send_retry(event, kafka)
+                else:
+                    # 404 errors are usually deleted sessions and won't recover
+                    LOGGER.debug("Not retrying %s event because this is a 404 error", event_type)
+            # Otherwise (if this IS a CREATE event), retry if the status is not 409
+            elif e.response.status_code != 409:
+                self._send_retry(event, kafka)
+            else:
+                LOGGER.debug("Not retrying CREATE event because this is a 409 error")
         except Exception as e:
-            LOGGER.error("EVENT: Exception while handling cfs-operator event: {}".format(e))
-            # CASMCMS-9335: Retry the event if it is a 404 error during create event. This is to handle
-            # the case where the session is created but is yet to appear in DB and an update to session is issued.
-            if "404 Client Error" not in str(e) or (event_type == 'CREATE' and "404 Client Error" in str(e)):
-                # 404 errors are usually deleted sessions and won't recover
+            LOGGER.error("EVENT: %s exception while handling cfs-operator event: %s",
+                         type(e).__name__, e)
+            # CASMCMS-9335 / CASMCMS-9627
+            # Retry non-404 errors.
+            # The exception to this is that we do want to retry HTTP 404 responses
+            # during session CREATE events, but those are covered by the previous exception
+            # block.
+            #
+            # This exception block will only trigger for exceptions with "404 Client Error"
+            # in their text but that are not HTTPErrors. I am not sure if any such exceptions
+            # are possible, but I am leaving this clause here to preserve the existing
+            # behavior when making the changes for CASMCMS-9627
+            if "404 Client Error" not in str(e):
                 self._send_retry(event, kafka)
         kafka.consumer.commit()
 
