@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Include process and thread IDs in log messages
+- CASMCMS-9627: During CREATE events, do not retry if the update session fails because
+  the `job` field has already been set. This is to avoid creating multiple Kubernetes
+  jobs for the same CFS session.
 
 ### Dependencies
 - Use appropriate `requests-retry-session` version based on Python version
