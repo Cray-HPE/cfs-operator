@@ -12,6 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the `job` field has already been set. This is to avoid creating multiple Kubernetes
   jobs for the same CFS session.
 
+### Dependencies
+- CASMCMS-9631: Updated `urllib3` from `1.26` to `2.6.3` to resolve CVEs:
+  - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14896210
+  - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192443
+  - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192442
+- CASMCMS-9631: Updated `cryptography` from `43.0.1` to `46.1` to resolve CVE:
+  - https://snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-15263096
+- CASMCMS-9631: Updated `pyasn1` from `0.4.8` to `0.6.2` to resolve CVE:
+  - https://snyk.io/vuln/SNYK-PYTHON-PYASN1-15032639
+- CASMCMS-9631: Updated the following modules to meet the new version requirements caused by the above updates:
+  - `cffi` from `1.14.6` to `2.0`
+  - `pyasn1-modules` from `0.2.8` to `0.4`
+
 ## [1.34.2] - 11/26/2025
 
 ### Dependencies
