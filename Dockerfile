@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022, 2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2022, 2024, 2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -30,8 +30,9 @@ RUN apk add --upgrade --no-cache apk-tools busybox && \
     apk add --no-cache gcc musl-dev openssh libffi-dev openssl-dev python3-dev py3-pip make curl bash git && \
     apk -U upgrade --no-cache
 ADD constraints.txt requirements.txt /app/
+# Fix wheel version to avoid build error
 RUN --mount=type=secret,id=netrc,target=/root/.netrc pip3 install --no-cache-dir -U pip && \
-    pip3 install --no-cache-dir -U wheel && \
+    pip3 install --no-cache-dir -U 'wheel>=0.45.1,<0.46' && \
     pip3 install --no-cache-dir -r requirements.txt && \
     pip3 list --format freeze
 COPY src/ /app/lib
