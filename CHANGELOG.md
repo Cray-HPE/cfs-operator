@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- Fix `wheel` version to prevent build failures
+
 ## [1.27.1] - 09/06/2024
 ### Dependencies
 - Bump `cryptography` to 43.0.1 to resolve CVE
