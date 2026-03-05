@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Include process and thread IDs in log messages
+
 ### Dependencies
 - Fix `wheel` version to prevent build failures
 
