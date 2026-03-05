@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CASMCMS-9627: During CREATE events, do not retry if the update session fails because
   the `job` field has already been set. This is to avoid creating multiple Kubernetes
   jobs for the same CFS session.
+- Include process and thread IDs in log messages
 
 ### Dependencies
 - CASMCMS-9631: Updated `urllib3` from `1.26` to `2.6.3` to resolve CVEs:
