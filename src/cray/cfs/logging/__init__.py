@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019, 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019, 2021-2022, 2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,7 @@ def setup_logging(env_key='STARTING_LOG_LEVEL', default_level='INFO') -> None:
     to the `default_level` if the key doesn't exist in the environment or if an
     invalid key is presented.
     """
-    log_format = "%(asctime)-15s - %(levelname)-7s - %(name)s - %(message)s"
+    log_format = "%(asctime)-15s - %(process)d - %(thread)d - %(levelname)-7s - %(name)s - %(message)s"
     requested_log_level = os.environ.get(env_key, default_level)
     log_level = logging.getLevelName(requested_log_level)
 
