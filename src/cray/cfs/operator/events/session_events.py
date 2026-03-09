@@ -141,8 +141,11 @@ class CFSSessionController:
             else:
                 LOGGER.warning('Invalid event type detected: {}'.format(event))
         except HTTPError as e:
-            LOGGER.error("EVENT: HTTP %d error while handling cfs-operator event: %s",
-                         e.response.status_code, e)
+            # Only log this as a warning, because these are expected to happen in the
+            # normal course of events, and most of the time it does not indicate a
+            # problem that requires investigation.
+            LOGGER.warning("EVENT: HTTP %d error while handling cfs-operator event: %s",
+                           e.response.status_code, e)
             try:
                 LOGGER.debug("Error detail: %s", e.response.json()["detail"])
             except Exception as e2:

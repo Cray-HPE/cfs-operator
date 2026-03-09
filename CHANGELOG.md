@@ -10,7 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - CASMCMS-9627: During CREATE events, do not retry if the update session fails because
   the `job` field has already been set. This is to avoid creating multiple Kubernetes
-  jobs for the same CFS session.
+  jobs for the same CFS session
+- CASMCMS-9627: Log HTTP errors as warnings rather than errors, because they are expected
+  in the normal course of events, and most of the time they do not indicate a problem
+  that requires investigation
 - Include process and thread IDs in log messages
 
 ### Dependencies
