@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 - Use appropriate `requests-retry-session` version based on Python version
 - Fix `wheel` version to prevent build failures
+- Update to latest patch version of `kafka-python` 2.0, to pick up bug fixes
 
 ## [1.27.1] - 09/06/2024
 ### Dependencies

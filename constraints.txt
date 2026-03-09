@@ -14,7 +14,7 @@ flake8==3.6.0
 google-auth==1.6.3
 idna==2.8
 Jinja2==2.10.3
-kafka-python==2.0.2
+kafka-python>=2.0.2,<2.1
 # CSM 1.6 moved to Kubernetes 1.24, so use client v24.x to ensure compatability
 kubernetes>=24.2,<24.3
 liveness>=1.4,<1.5
