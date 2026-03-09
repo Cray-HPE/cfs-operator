@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,11 +26,11 @@ mode: ContinuousDeployment
 branches:
   main:
     regex: ^master$|^main$
-    mode: ContinuousDelivery
     tag: rc
+    mode: ContinuousDelivery
   develop:
     regex: ^develop$
-    increment: Minor
+    increment: Minor           ## The NEXT release will be 1.2.0 if the latest production release is 1.1.x
     mode: ContinuousDeployment
   release:
     # Do not consider legacy release/[shasta,csm]-* branches as gitflow release branches
