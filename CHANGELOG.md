@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.27.2] - 03/09/2026
 ### Changed
 - Include process and thread IDs in log messages
 - CASMCMS-9627: During CREATE events, do not retry if the update session fails because
