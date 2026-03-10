@@ -4,17 +4,17 @@ attrs==19.1.0
 bcrypt==3.1.7
 cachetools==3.0.0
 certifi==2023.7.22
-cffi==1.14.6
+cffi>=2.0,<2.1
 chardet==3.0.4
 colorlog==3.2.0
 coverage==4.5.4
-cryptography>=43.0.1,<43.1
+cryptography>=46.0.5,<46.1
 dictdiffer==0.8.1
 flake8==3.6.0
 google-auth==1.6.3
 idna==2.8
 Jinja2==2.10.3
-kafka-python==2.0.2
+kafka-python>=2.0.2,<2.1
 # CSM 1.6 moved to Kubernetes 1.24, so use client v24.x to ensure compatability
 kubernetes>=24.2,<24.3
 liveness>=1.4,<1.5
@@ -26,8 +26,8 @@ oauthlib==2.1.0
 paramiko==2.11.1
 pluggy==0.8.1
 py==1.8.2
-pyasn1==0.4.8
-pyasn1-modules==0.2.8
+pyasn1>=0.6.2,<0.7
+pyasn1-modules>=0.4,<0.5
 pycodestyle==2.4.0
 pycparser==2.19
 pyflakes==2.0.0
@@ -37,7 +37,7 @@ pytest-cov==2.6.1
 python-dateutil==2.7.5
 PyYAML==6.0.1
 redis==3.2.1
-requests==2.22.0
+requests>=2.31,<2.32
 requests-oauthlib==1.0.0
 requests-retry-session>=0.5,<0.6    ; python_version < '3.9'
 requests-retry-session>=1.0,<1.1    ; python_version >= '3.9' and python_version < '3.10'
@@ -48,6 +48,6 @@ requests-retry-session>=5.0,<5.1    ; python_version >= '3.13'
 rsa==4.7.2
 setuptools>=49.3.2
 ujson==5.8.0
-urllib3==1.25.11
+urllib3>=2.6.3,<2.7
 virtualenv==15.2.0
 websocket-client==0.54.0
