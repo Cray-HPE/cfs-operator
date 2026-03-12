@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.35.0] - 03/12/2026
+
 ### Changed
 - CASMCMS-9627: During CREATE events, do not retry if the update session fails because
   the `job` field has already been set. This is to avoid creating multiple Kubernetes
