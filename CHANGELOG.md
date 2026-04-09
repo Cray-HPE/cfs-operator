@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.36.0] - 04/09/2026
+
 ### Dependencies
 - CASMCMS-9639: Updated `cray-aee` from `1.21` to `1.22` to resolve CVEs:
   - CRITICAL
