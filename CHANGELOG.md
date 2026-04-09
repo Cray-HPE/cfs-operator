@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- CASMCMS-9639: Updated `cray-aee` from `1.21` to `1.22` to resolve CVEs:
+  - CRITICAL
+    - https://snyk.io/vuln/SNYK-GOLANG-GOOGLEGOLANGORGGRPC-15691172
+  - HIGH
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192442
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14192443
+    - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-14896210
+    - https://snyk.io/vuln/SNYK-GOLANG-GOOGLEGOLANGORGGRPC-5953328
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXOAUTH2JWS-8749594
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2HPACK-3358253
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-2313688
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-3028257
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-3323837
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-5953327
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-5958903
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTP2-6531285
+    - https://snyk.io/vuln/SNYK-GOLANG-GOLANGORGXNETHTTPHTTPPROXY-9058601
+    - https://snyk.io/vuln/npm:ws:20171108
+    - https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMSIRUPSENLOGRUS-5564391
+    - https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMHASHICORPVAULTSDKHELPERJSONUTIL-12301502
+    - https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMDGRIJALVAJWTGO-596515
+    - https://snyk.io/vuln/snyk:lic:pip:ara:GPL-3.0
+    - https://snyk.io/vuln/snyk:lic:pip:ansible-core:GPL-3.0
+
 ## [1.35.1] - 04/09/2026
 
 ### Dependencies
