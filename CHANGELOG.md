@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- CASMCMS-9641: Updated `ujson` from `5.8` to `5.12` to resolve CVEs:
+  - https://snyk.io/vuln/SNYK-PYTHON-UJSON-15682605
+  - https://snyk.io/vuln/SNYK-PYTHON-UJSON-15682606
+
 ## [1.35.0] - 03/12/2026
 
 ### Changed
