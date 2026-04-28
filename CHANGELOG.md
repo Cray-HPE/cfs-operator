@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed fatal Python errors in `src/cray/cfs/operator/events/job_events.py`
+  and `src/cray/cfs/teardown/__main__.py`
+
 ## [1.27.2] - 03/09/2026
 ### Changed
 - Include process and thread IDs in log messages

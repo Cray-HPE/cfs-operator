@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -143,8 +143,8 @@ def _finish_the_job(job_id: str, cfs_name: str, completion_flag: str = "complete
     resp.raise_for_status()
     try:
         response = resp.json()
-    except JSONDecodeError:
-        LOGGER.error("Non-JSON response received from IMS: '%s'", response)
+    except JSONDecodeError as err:
+        LOGGER.error("Non-JSON response received from IMS: '%s'", resp.text)
         raise
     for ssh_container in response['ssh_containers']:
         if ssh_container['name'] == cfs_name:
@@ -400,8 +400,8 @@ def main() -> None:  # noqa: C901
                 except Exception as err:
                     teardown_success = False
                     LOGGER.error(
-                        "Unable to update cfsession=%s with image=%s, result=%s. Error: %s",
-                        image_id, response, err
+                        "Unable to update cfsession=%s with image=%s, result=%s, response=%s. %s: %s",
+                        cfs_name, image_id, result, response, type(err).__name__, err
                     )
 
             all_image_ids.remove(image_id)
