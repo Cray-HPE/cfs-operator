@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -137,19 +137,19 @@ class CFSJobMonitor:
         if not job_name:
             # This shouldn't be able to happen.
             # Session jobs are only monitored if the job has been created.
-            LOGGER.warning('No job is specified for session {}.  This is an invalid state.'.format(
-                session['name']))
+            LOGGER.warning('No job is specified for session %s.  This is an invalid state.',
+                           session['name'])
             return True
         try:
             job = k8s_jobs.read_namespaced_job(job_name, self.namespace)
         except ApiException as e:
             if getattr(e, 'status', None) == 404:
-                LOGGER.warning('Job was deleted before CFS could determine success.')
+                LOGGER.warning('Job=%s was deleted before CFS could determine success.', job_name)
                 cfs_sessions.update_session_status(session_name, data={'status': 'complete',
                                                                        'succeeded': 'unknown'})
                 return True
             else:
-                LOGGER.warning("Unable to fetch Job=%s", job_name, e)
+                LOGGER.warning("Unable to fetch Job=%s; %s: %s", job_name, type(e).__name__, e)
                 return False
         session_status = session.get('status', {}).get('session', {})
         if job.status.start_time and session_status.get('status') == 'pending':
