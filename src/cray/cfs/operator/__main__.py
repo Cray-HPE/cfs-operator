@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,10 +31,11 @@ import threading
 import os
 from pkg_resources import get_distribution
 import time
-from urllib3.exceptions import MaxRetryError
 
+from csm_utils.logging import exc_type_msg
 from kubernetes import config, client
 from kubernetes.config.config_exception import ConfigException
+from urllib3.exceptions import MaxRetryError
 
 from .events import CFSSessionController
 from cray.cfs.logging import setup_logging, update_logging
@@ -66,7 +67,7 @@ def session_cleanup():
             if ttl:
                 sessions.delete_sessions(status='complete', min_age=ttl)
         except Exception as e:
-            LOGGER.warning('Exception during session cleanup: {}'.format(e))
+            LOGGER.warning('Exception during session cleanup: %s', exc_type_msg(e))
 
 
 def monotonic_liveliness_heartbeat():
