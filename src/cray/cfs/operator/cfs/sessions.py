@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,9 +21,11 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-import ujson as json
 import logging
+
+from csm_utils.logging import compact_response_text, exc_type_msg
 from requests.exceptions import HTTPError, ConnectionError
+import ujson as json
 from urllib3.exceptions import MaxRetryError
 
 from . import requests_retry_session
@@ -37,19 +39,21 @@ def get_session(session_id):
     """Get information for a single CFS session"""
     url = ENDPOINT + '/' + session_id
     session = requests_retry_session()
+    LOGGER.debug("GET %s", url)
     try:
         response = session.get(url)
         response.raise_for_status()
         cfs_session = json.loads(response.text)
     except (ConnectionError, MaxRetryError) as e:
-        LOGGER.error("Unable to connect to CFS: {}".format(e))
+        LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         raise e
     except HTTPError as e:
-        LOGGER.error("Unexpected response from CFS: {}".format(e))
+        LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         raise e
     except json.JSONDecodeError as e:
-        LOGGER.error("Non-JSON response from CFS: {}".format(e))
+        LOGGER.error("Non-JSON response from CFS: %s", exc_type_msg(e))
         raise e
+    LOGGER.debug("GET %s response=%s", url, compact_response_text(response.text))
     return cfs_session
 
 
@@ -69,21 +73,28 @@ def get_sessions(parameters=None):
     """Get information for all CFS sessions"""
     url = ENDPOINT
     session = requests_retry_session()
+    if not parameters:
+        parameters = {}
+    LOGGER.debug("GET %s (params=%s)", url, parameters)
     try:
-        if not parameters:
-            parameters = {}
         response = session.get(url, params=parameters)
         response.raise_for_status()
         cfs_sessions = json.loads(response.text)
     except (ConnectionError, MaxRetryError) as e:
-        LOGGER.error("Unable to connect to CFS: {}".format(e))
+        LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         raise e
     except HTTPError as e:
-        LOGGER.error("Unexpected response from CFS: {}".format(e))
+        LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         raise e
     except json.JSONDecodeError as e:
-        LOGGER.error("Non-JSON response from CFS: {}".format(e))
+        LOGGER.error("Non-JSON response from CFS: %s", exc_type_msg(e))
         raise e
+    LOGGER.debug(
+        "GET %s (params=%s) response=%s",
+        url,
+        parameters,
+        compact_response_text(response.text)
+    )
     return cfs_sessions
 
 
@@ -91,19 +102,26 @@ def update_session(session_id, data):
     """Update information for a single CFS session"""
     url = ENDPOINT + '/' + session_id
     session = requests_retry_session()
+    LOGGER.debug("PATCH %s (body=%s)", url, data)
     try:
         response = session.patch(url, json=data)
         response.raise_for_status()
         cfs_session = json.loads(response.text)
     except (ConnectionError, MaxRetryError) as e:
-        LOGGER.error("Unable to connect to CFS: {}".format(e))
+        LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         raise e
     except HTTPError as e:
-        LOGGER.error("Unexpected response from CFS: {}".format(e))
+        LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         raise e
     except json.JSONDecodeError as e:
-        LOGGER.error("Non-JSON response from CFS: {}".format(e))
+        LOGGER.error("Non-JSON response from CFS: %s", exc_type_msg(e))
         raise e
+    LOGGER.debug(
+        "PATCH %s (body=%s) response=%s",
+        url,
+        data,
+        compact_response_text(response.text)
+    )
     return cfs_session
 
 
@@ -116,15 +134,17 @@ def delete_sessions(status=None, min_age=None):
     if min_age:
         params['min_age'] = min_age
     session = requests_retry_session()
+    LOGGER.debug("DELETE %s (params=%s)", url, params)
     try:
         response = session.delete(url, params=params)
         response.raise_for_status()
     except (ConnectionError, MaxRetryError) as e:
-        LOGGER.error("Unable to connect to CFS: {}".format(e))
+        LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         raise e
     except HTTPError as e:
-        LOGGER.error("Unexpected response from CFS: {}".format(e))
+        LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         raise e
+    LOGGER.debug("DELETE %s (params=%s) succeeded", url, params)
 
 
 def update_session_status(session_id, data):

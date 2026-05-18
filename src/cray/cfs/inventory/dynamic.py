@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -28,10 +28,12 @@ import keyword
 import logging
 import os
 import re
+from collections import defaultdict
+
+from csm_utils.logging import exc_type_msg
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from collections import defaultdict
 
 from cray.cfs.inventory import CFSInventoryBase
 
@@ -94,7 +96,7 @@ class DynamicInventory(CFSInventoryBase):
                 inventory[group_name] = hosts
             return inventory
         except Exception as e:
-            LOGGER.error('Encountered an unknown exception getting groups data: {}'.format(e))
+            LOGGER.error('Encountered an unknown exception getting groups data: %s', exc_type_msg(e))
         return inventory
 
     def _get_partitions(self):
@@ -114,7 +116,7 @@ class DynamicInventory(CFSInventoryBase):
                 inventory[group_name] = hosts
             return inventory
         except Exception as e:
-            LOGGER.error('Encountered an unknown exception getting partitions data: {}'.format(e))
+            LOGGER.error('Encountered an unknown exception getting partitions data: %s', exc_type_msg(e))
         return inventory
 
     def _get_components(self):
@@ -131,7 +133,7 @@ class DynamicInventory(CFSInventoryBase):
                     hosts[role + '_' + subrole][str(component['ID'])] = {}
             return {group: {'hosts': host} for group, host in hosts.items()}
         except Exception as e:
-            LOGGER.error('Encountered an unknown exception getting component data: {}'.format(e))
+            LOGGER.error('Encountered an unknown exception getting component data: %s', exc_type_msg(e))
         return {}
 
     def _get_data(self, endpoint):

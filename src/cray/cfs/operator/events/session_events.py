@@ -32,6 +32,7 @@ import threading
 import uuid
 import base64
 
+from csm_utils.logging import exc_type_msg
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from kubernetes.config.config_exception import ConfigException
@@ -123,7 +124,7 @@ class CFSSessionController:
                 for event in kafka.consumer:
                     self._handle_event(event.value, kafka)
             except Exception as e:
-                LOGGER.warning('Exception handling kafka event: {}'.format(e))
+                LOGGER.warning('Exception handling kafka event: %s', exc_type_msg(e))
 
     def _handle_event(self, event, kafka):
         event_type = None
@@ -132,7 +133,7 @@ class CFSSessionController:
             event_data = event.get('data')
             session_name = event_data.get('name')
             LOGGER.info("EVENT: %s %s", event_type, session_name)
-            LOGGER.debug("RAW OBJECT: %s %s", session_name, json.dumps(event_data, indent=2))
+            LOGGER.debug("RAW OBJECT: %s %s", session_name, event_data)
 
             if event_type == 'CREATE':
                 self._handle_added(event_data)
@@ -145,12 +146,12 @@ class CFSSessionController:
             # normal course of events, and most of the time it does not indicate a
             # problem that requires investigation.
             LOGGER.warning("EVENT: HTTP %d error while handling cfs-operator event: %s",
-                           e.response.status_code, e)
+                           e.response.status_code, exc_type_msg(e))
             try:
                 LOGGER.debug("Error detail: %s", e.response.json()["detail"])
             except Exception as e2:
-                LOGGER.debug("%s exception trying to get error details: %s",
-                             type(e2).__name__, e2)
+                LOGGER.debug("Exception trying to get error details: %s",
+                             exc_type_msg(e))
             # CASMCMS-9335 / CASMCMS-9627
             # Retry on most HTTP errors
             #
@@ -175,10 +176,10 @@ class CFSSessionController:
             elif e.response.status_code != 409:
                 self._send_retry(event, kafka)
             else:
-                LOGGER.debug("Not retrying CREATE event because this is a 409 error")
+                LOGGER.debug("Not retrying %s event because this is a 409 error", event_type)
         except Exception as e:
-            LOGGER.error("EVENT: %s exception while handling cfs-operator event: %s",
-                         type(e).__name__, e)
+            LOGGER.error("EVENT: Exception while handling cfs-operator event: %s",
+                         exc_type_msg(e))
             # CASMCMS-9335 / CASMCMS-9627
             # Retry non-404 errors.
             # The exception to this is that we do want to retry HTTP 404 responses
@@ -236,12 +237,12 @@ class CFSSessionController:
             )
             LOGGER.info("Job deleted for CFS Session=%s", session_name)
             LOGGER.debug(
-                'Job "%s" deletion response: %s', job_id, json.dumps(resp.to_dict(), indent=2)
+                'Job "%s" deletion response: %s', job_id, resp.to_dict()
             )
         except ApiException as err:
             if err.status == 404:
                 LOGGER.warning("Job not deleted; not found for CFS Session=%s", session_name)
-                LOGGER.debug('Job "%s" deletion response: %s', job_id, err)
+                LOGGER.debug('Job "%s" deletion response: %s', job_id, exc_type_msg(err))
             else:
                 LOGGER.warning("Exception calling BatchV1Api->delete_namespaced_job", exc_info=True)
 
@@ -775,7 +776,7 @@ class CFSSessionController:
             )
             return job
         except ApiException as err:
-            LOGGER.error("Unable to create Job=%s: %s", job_id, err)
+            LOGGER.error("Unable to create Job=%s: %s", job_id, exc_type_msg(err))
             # TODO: fixme - transition CFS to error state?
 
 # Valid units are minutes, hours, days, weeks

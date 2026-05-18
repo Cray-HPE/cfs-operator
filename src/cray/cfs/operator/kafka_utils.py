@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,15 +21,18 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-import ujson as json
 import logging
 import time
+
+from csm_utils.logging import exc_type_msg
 
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaTimeoutError
 
 from kubernetes import config, client
 from kubernetes.config.config_exception import ConfigException
+
+import ujson as json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -78,7 +81,7 @@ class KafkaWrapper:
             try:
                 self.producer.close(timeout=KAFKA_PRODUCE_TIMEOUT)
             except KafkaTimeoutError as e:
-                LOGGER.warning('Unable to close previous Kafka producer: {}'.format(e))
+                LOGGER.warning('Unable to close previous Kafka producer: %s', exc_type_msg(e))
             self.producer = None
         while not self.producer:
             self._init_kafka_host()
@@ -88,7 +91,7 @@ class KafkaWrapper:
                     value_serializer=lambda m: json.dumps(m).encode('utf-8'),
                     retries=5)
             except Exception as e:
-                LOGGER.error('Error initializing Kafka producer: {}'.format(e))
+                LOGGER.error('Error initializing Kafka producer: %s', exc_type_msg(e))
                 if not retry:
                     return
                 time.sleep(5)
