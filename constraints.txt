@@ -10,6 +10,7 @@ charset-normalizer>=3.4.2,<3.5
 colorlog==3.2.0
 coverage==4.5.4
 cryptography>=46.0.5,<46.1
+csm-utils>=0.1,<0.2
 dictdiffer==0.8.1
 flake8==3.6.0
 gitdb==4.0.12
