@@ -1,6 +1,7 @@
 --trusted-host artifactory.algol60.net
 --extra-index-url http://artifactory.algol60.net/artifactory/csm-python-modules/simple
 -c constraints.txt
+csm-utils
 dictdiffer
 gitpython
 hvac
