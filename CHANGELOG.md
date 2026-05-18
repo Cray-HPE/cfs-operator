@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- CAST-39551: Added additional debug logging statements.
+
 ### Fixed
 - Fixed fatal Python errors in `src/cray/cfs/operator/events/job_events.py`
   and `src/cray/cfs/teardown/__main__.py`

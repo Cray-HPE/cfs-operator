@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,6 +22,8 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 import logging
+
+from csm_utils.logging import exc_type_msg
 import ujson as json
 from requests.exceptions import HTTPError, ConnectionError
 from urllib3.exceptions import MaxRetryError
@@ -72,11 +74,11 @@ class Options:
             response.raise_for_status()
             return json.loads(response.text)
         except (ConnectionError, MaxRetryError) as e:
-            LOGGER.error("Unable to connect to CFS: {}".format(e))
+            LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         except HTTPError as e:
-            LOGGER.error("Unexpected response from CFS: {}".format(e))
+            LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         except json.JSONDecodeError as e:
-            LOGGER.error("Non-JSON response from CFS: {}".format(e))
+            LOGGER.error("Non-JSON response from CFS: %s", exc_type_msg(e))
         return {}
 
     def _patch_options(self, obj):
@@ -86,9 +88,9 @@ class Options:
             response = session.patch(ENDPOINT, json=obj)
             response.raise_for_status()
         except (ConnectionError, MaxRetryError) as e:
-            LOGGER.error("Unable to connect to CFS: {}".format(e))
+            LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         except HTTPError as e:
-            LOGGER.error("Unexpected response from CFS: {}".format(e))
+            LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
 
     def get_option(self, key, type):
         return type(self.options[key])

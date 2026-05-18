@@ -27,6 +27,8 @@ cray.cfs.logging - helper functions for logging in CFS
 import logging
 import os
 
+from csm_utils.logging import exc_type_msg
+
 from cray.cfs.operator.cfs.options import options
 
 
@@ -70,4 +72,4 @@ def update_logging(update_options=False) -> None:
             LOGGER.log(new_level, 'Logging level changed from {} to {}'.format(
                 logging.getLevelName(current_level), logging.getLevelName(new_level)))
     except Exception as e:
-        LOGGER.error('Error updating logging level: {}'.format(e))
+        LOGGER.error('Error updating logging level: %s', exc_type_msg(e))

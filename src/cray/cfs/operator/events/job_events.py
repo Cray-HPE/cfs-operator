@@ -28,6 +28,8 @@ import logging
 import threading
 import time
 
+from csm_utils.logging import exc_type_msg
+
 from requests.exceptions import HTTPError
 
 from kubernetes import config, client
@@ -71,7 +73,7 @@ class CFSJobMonitor:
                     self._sync_sessions()
                     intervals = 0
             except Exception as e:
-                LOGGER.warning('Exception monitoring sessions: {}'.format(e))
+                LOGGER.warning('Exception monitoring sessions: %s', exc_type_msg(e))
             intervals += 1
             time.sleep(30)
 
@@ -81,14 +83,14 @@ class CFSJobMonitor:
                 self.cleanup_jobs()
                 time.sleep(60*60)
             except Exception as e:
-                LOGGER.warning('Exception running cleanup: {}'.format(e))
+                LOGGER.warning('Exception running cleanup: %s', exc_type_msg(e))
 
     def run(self):  # pragma: no cover
         while True:
             try:
                 self._sync_sessions()
             except Exception as e:
-                LOGGER.warning('Exception during initial session sync: {}'.format(e))
+                LOGGER.warning('Exception during initial session sync: %s', exc_type_msg(e))
                 time.sleep(30)
             else:
                 break
@@ -101,11 +103,12 @@ class CFSJobMonitor:
             # Use list(keys()) rather than .items() so that other threads can edit dict
             for name in list(self.sessions.keys()):
                 if self.session_complete(self.sessions[name]):
+                    LOGGER.debug("monitor_sessions: %s is complete", name)
                     completed_sessions.append(name)
             for name in completed_sessions:
                 self.remove_session(name)
         except Exception as e:
-            LOGGER.error('Exception encountered while monitoring jobs: {}'.format(e))
+            LOGGER.error('Exception encountered while monitoring jobs: %s', exc_type_msg(e))
 
     def cleanup_jobs(self):
         try:
@@ -119,7 +122,7 @@ class CFSJobMonitor:
             if i:
                 LOGGER.info('Cleanup removed {} orphaned cfs jobs'.format(i))
         except Exception as e:
-            LOGGER.warning('Exception encountered while cleaning jobs: {}'.format(e))
+            LOGGER.warning('Exception encountered while cleaning jobs: %s', exc_type_msg(e))
 
     def add_session(self, session):
         self.sessions[session['name']] = session
@@ -149,9 +152,15 @@ class CFSJobMonitor:
                                                                        'succeeded': 'unknown'})
                 return True
             else:
-                LOGGER.warning("Unable to fetch Job=%s; %s: %s", job_name, type(e).__name__, e)
+                LOGGER.warning("Unable to fetch Job=%s; %s", job_name, exc_type_msg(e))
                 return False
         session_status = session.get('status', {}).get('session', {})
+        LOGGER.debug(
+            "session_complete: name=%s, job status=%s, session status=%s",
+            session_name,
+            job.status,
+            session_status,
+        )
         if job.status.start_time and session_status.get('status') == 'pending':
             LOGGER.info("EVENT: JobStart %s", session_name)
             cfs_sessions.update_session_status(session_name, data={'status': 'running'})

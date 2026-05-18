@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,11 +21,13 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-import ujson as json
 import logging
-from requests.exceptions import HTTPError, ConnectionError
-from urllib3.exceptions import MaxRetryError
 import urllib.parse
+
+from csm_utils.logging import exc_type_msg
+from requests.exceptions import HTTPError, ConnectionError
+import ujson as json
+from urllib3.exceptions import MaxRetryError
 
 from . import requests_retry_session
 from . import ENDPOINT as BASE_ENDPOINT
@@ -43,13 +45,13 @@ def get_source(source_name):
         response.raise_for_status()
         cfs_source = json.loads(response.text)
     except (ConnectionError, MaxRetryError) as e:
-        LOGGER.error("Unable to connect to CFS: {}".format(e))
+        LOGGER.error("Unable to connect to CFS: %s", exc_type_msg(e))
         raise e
     except HTTPError as e:
-        LOGGER.error("Unexpected response from CFS: {}".format(e))
+        LOGGER.error("Unexpected response from CFS: %s", exc_type_msg(e))
         raise e
     except json.JSONDecodeError as e:
-        LOGGER.error("Non-JSON response from CFS: {}".format(e))
+        LOGGER.error("Non-JSON response from CFS: %s", exc_type_msg(e))
         raise e
     return cfs_source
 

@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -28,6 +28,8 @@ import logging
 import threading
 import time
 
+from csm_utils.logging import exc_type_msg
+
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.utils.clients.ims.jobs import get_jobs as get_ims_jobs
 from cray.cfs.utils.clients.ims.jobs import delete_job as delete_ims_job
@@ -46,7 +48,7 @@ class IMSJobMonitor:
                 if jobs:
                     self._cleanup_orphaned_ims_jobs(jobs)
             except Exception as e:
-                LOGGER.warning('Exception during IMS session cleanup: {}'.format(e))
+                LOGGER.warning('Exception during IMS session cleanup: %s', exc_type_msg(e))
             time.sleep(60)
 
     @staticmethod
