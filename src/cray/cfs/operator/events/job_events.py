@@ -28,7 +28,7 @@ import logging
 import threading
 import time
 
-from csm_utils.logging import exc_type_msg
+from csm_utils.logging import compact_response_text, exc_type_msg
 
 from requests.exceptions import HTTPError
 
@@ -47,6 +47,20 @@ _api_client = client.ApiClient()
 k8s_jobs = client.BatchV1Api(_api_client)
 
 LOGGER = logging.getLogger('cray.cfs.operator.events.job_events')
+
+
+class _compact_k8s_job_status:
+    """
+    Small class that allows us to log a compressed-text representation of
+    client.V1Job.status, but only calculating it when we actually are going
+    to log it.
+    """
+    def __init__(self, job: client.V1Job) -> None:
+        self.job = job
+
+    def __str__(self) -> str:
+        """ Wrapper for compact_response_text """
+        return compact_response_text(str(self.job.status)).__str__()
 
 
 class CFSJobMonitor:
@@ -158,7 +172,7 @@ class CFSJobMonitor:
         LOGGER.debug(
             "session_complete: name=%s, job status=%s, session status=%s",
             session_name,
-            job.status,
+            _compact_k8s_job_status(job),
             session_status,
         )
         if job.status.start_time and session_status.get('status') == 'pending':

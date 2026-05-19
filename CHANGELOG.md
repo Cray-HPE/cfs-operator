@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- CAST-39551: Log Kubernetes job information on a single line.
+
 ## [1.27.3] - 05/18/2026
 ### Added
 - CAST-39551: Added additional debug logging statements.
