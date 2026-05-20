@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- Updated `GitPython` from `3.1.44` to `3.1.50` to resolve CVEs:
+  - CRITICAL
+    - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16298054
+  - HIGH
+    - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16298057
+    - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16438979
+    - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16438980
+    - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16624542
+
+
 ## [1.36.1] - 05/20/2026
 
 ### Added
