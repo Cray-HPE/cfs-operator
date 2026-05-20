@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.3] - 05/20/2026
+
 ### Fixed
 - Fixed fatal Python errors in `src/cray/cfs/operator/events/job_events.py`
   and `src/cray/cfs/teardown/__main__.py`
