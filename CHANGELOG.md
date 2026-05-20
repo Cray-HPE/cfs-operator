@@ -16,7 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16438979
     - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16438980
     - https://snyk.io/vuln/SNYK-PYTHON-GITPYTHON-16624542
-
+- Updated `urllib3` from `2.6.3` to `2.7` to resolve CVEs:
+  - HIGH
+    - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-16642024
+    - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-16642059
 
 ## [1.36.1] - 05/20/2026
 
