@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - HIGH
     - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-16642024
     - https://snyk.io/vuln/SNYK-PYTHON-URLLIB3-16642059
+- Use latest `requests-retry-session`
 
 ## [1.36.1] - 05/20/2026
 
