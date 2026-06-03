@@ -30,6 +30,7 @@ import time
 
 from csm_utils.logging import exc_type_msg
 
+from cray.cfs.logging import update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.utils.clients.ims.jobs import get_jobs as get_ims_jobs
 from cray.cfs.utils.clients.ims.jobs import delete_job as delete_ims_job
@@ -43,6 +44,7 @@ class IMSJobMonitor:
 
     def _run(self):  # pragma: no cover
         while True:
+            update_logging()
             try:
                 jobs = self._get_running_ims_jobs()
                 if jobs:

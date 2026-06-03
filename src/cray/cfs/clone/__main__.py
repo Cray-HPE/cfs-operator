@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -101,6 +101,7 @@ def clone_repo(clone_url, repo_directory, commit=None, source=None, retry_limit=
 
     x = 1
     while True:
+        update_logging()
         try:
             repo = git.Repo.clone_from(clone_url, os.path.join(SHARED_DIRECTORY, repo_directory), env=clone_env)
             LOGGER.info(f"Successfully cloned repo {clone_url}")

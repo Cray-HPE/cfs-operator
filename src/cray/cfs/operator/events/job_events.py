@@ -36,6 +36,7 @@ from kubernetes import config, client
 from kubernetes.client.rest import ApiException
 from kubernetes.config.config_exception import ConfigException
 
+from cray.cfs.logging import update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 
 try:
@@ -80,6 +81,7 @@ class CFSJobMonitor:
     def _run(self):  # pragma: no cover
         intervals = 0
         while True:
+            update_logging()
             try:
                 self.monitor_sessions()
                 if intervals >= 10:
@@ -94,6 +96,7 @@ class CFSJobMonitor:
     def _run_cleanup(self):  # pragma: no cover
         while True:
             try:
+                update_logging()
                 self.cleanup_jobs()
                 time.sleep(60*60)
             except Exception as e:
@@ -101,6 +104,7 @@ class CFSJobMonitor:
 
     def run(self):  # pragma: no cover
         while True:
+            update_logging()
             try:
                 self._sync_sessions()
             except Exception as e:

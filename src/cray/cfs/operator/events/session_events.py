@@ -35,10 +35,10 @@ from csm_utils.logging import exc_type_msg
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from kubernetes.config.config_exception import ConfigException
-import requests
 from requests.exceptions import HTTPError
 import ujson as json
 
+from cray.cfs.logging import update_logging
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 from cray.cfs.operator.cfs.options import options
 from cray.cfs.operator.cfs.configurations import get_configuration
@@ -76,6 +76,7 @@ class CFSSessionController:
         self.env = env
         self.job_monitor = CFSJobMonitor(env)
         self.ims_monitor = IMSJobMonitor()
+        self._last_log_update = None
 
     def run(self):  # pragma: no cover
         self.job_monitor.run()
@@ -84,11 +85,19 @@ class CFSSessionController:
 
     def _run(self):  # pragma: no cover
         while True:
+            update_logging()
             try:
                 kafka = KafkaWrapper('cfs-session-events',
                                      group_id='cfs-operator',
                                      enable_auto_commit=False)
+            except Exception as e:
+                LOGGER.warning('Exception initializing KafkaWrapper: %s', exc_type_msg(e))
+                continue
+
+            try:
                 for event in kafka.consumer:
+                    update_logging()
+                    LOGGER.debug("event=%s", event)
                     self._handle_event(event.value, kafka)
             except Exception as e:
                 LOGGER.warning('Exception handling kafka event: %s', exc_type_msg(e))
@@ -99,7 +108,8 @@ class CFSSessionController:
             event_data = event.get('data')
             session_name = event_data.get('name')
             LOGGER.info("EVENT: %s %s", event_type, session_name)
-            LOGGER.debug("RAW OBJECT: %s %s", session_name, event_data)
+            LOGGER.debug("RAW OBJECT: session_name=%s event_type=%s event_data=%s",
+                         session_name, event_type, event_data)
 
             if event_type == 'CREATE':
                 self._handle_added(event_data)

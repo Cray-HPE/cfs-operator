@@ -226,6 +226,7 @@ def do_success(image_id: str, job_id: str, cfs_name: str, cfs_namespace: str, qu
     start_time = datetime.now()
     attempt_count = 0
     while True:
+        update_logging()
         attempt_count += 1
         try:
             resp = session.get("http://{}:{}/jobs/{}".format(host, port, job_id))
@@ -370,6 +371,7 @@ def main() -> None:  # noqa: C901
     # report as necessary
     try:
         while all_image_ids:
+            update_logging()
             LOGGER.debug("all_image_ids=%s", all_image_ids)
             result, image_id, job_id, response = pq.get()
             LOGGER.debug(
