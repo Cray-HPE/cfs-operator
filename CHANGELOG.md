@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.27.5] - 06/08/2026
+### Changed
+- Small logging improvements
+
+### Dependencies
+- Update to `kafka-python` 2.3
+
 ## [1.27.4] - 05/19/2026
 ### Changed
 - CAST-39551: Log Kubernetes job information on a single line.
