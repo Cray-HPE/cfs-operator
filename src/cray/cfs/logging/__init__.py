@@ -25,7 +25,10 @@
 cray.cfs.logging - helper functions for logging in CFS
 """
 import logging
+import datetime
 import os
+import threading
+import sys
 
 from csm_utils.logging import exc_type_msg
 
@@ -33,6 +36,10 @@ from cray.cfs.operator.cfs.options import options
 
 
 LOGGER = logging.getLogger(__name__)
+
+# Prevent multiple threads from updating the log level at the same time
+# (mainly to avoid noise in the log)
+_LogLevelUpdateLock = threading.Lock()
 
 
 def setup_logging(env_key='STARTING_LOG_LEVEL', default_level='INFO') -> None:
@@ -58,18 +65,31 @@ def setup_logging(env_key='STARTING_LOG_LEVEL', default_level='INFO') -> None:
 def update_logging(update_options=False) -> None:
     """ Updates the current logging level base on the value in the options database """
     try:
-        if update_options:
-            options.update()
+        options.update(force=update_options)
+    except Exception as e:
+        LOGGER.error('Error updating options (force=%s): %s', update_options, exc_type_msg(e))
+        return
+    try:
         if not options.logging_level:
+            LOGGER.debug('options.logging_level is falsey/not set')
             return
-        new_level = logging.getLevelName(options.logging_level.upper())
-        current_level = LOGGER.getEffectiveLevel()
-        if current_level != new_level:
-            LOGGER.log(current_level, 'Changing logging level from {} to {}'.format(
-                logging.getLevelName(current_level), logging.getLevelName(new_level)))
-            logger = logging.getLogger()
-            logger.setLevel(new_level)
-            LOGGER.log(new_level, 'Logging level changed from {} to {}'.format(
-                logging.getLevelName(current_level), logging.getLevelName(new_level)))
+    except Exception as e:
+        LOGGER.error('Error checking options.logging_level: %s', exc_type_msg(e))
+        return
+    try:
+        desired_level_str = options.logging_level.upper()
+        desired_level_int = logging.getLevelName(desired_level_str)
+        current_level_int = LOGGER.getEffectiveLevel()
+        if current_level_int == desired_level_int:
+            # No update needed
+            return
+        # Take a lock to prevent multiple threads from doing this
+        with _LogLevelUpdateLock:
+            current_level_str = logging.getLevelName(current_level_int)
+            LOGGER.log(current_level_int, 'Changing logging level from %s to %s',
+                       current_level_str, desired_level_str)
+            logging.getLogger().setLevel(desired_level_int)
+            LOGGER.log(desired_level_int, 'Logging level changed from %s to %s',
+                       current_level_str, desired_level_str)
     except Exception as e:
         LOGGER.error('Error updating logging level: %s', exc_type_msg(e))

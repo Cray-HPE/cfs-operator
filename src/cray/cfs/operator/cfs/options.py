@@ -22,6 +22,9 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 import logging
+import threading
+import time
+from typing import Optional
 
 from csm_utils.logging import exc_type_msg
 import ujson as json
@@ -42,19 +45,48 @@ DEFAULTS = {
     'debug_wait_time': 3600
 }
 
+# How often (in seconds) to refresh the option values
+OPTIONS_UPDATE_INTERVAL = 15
+
 
 class Options:
     """
-    Handler for reading configuration options from the CFS api
+    Handler for reading configuration options from the CFS API
 
     This caches the options so that frequent use of these options do not all
     result in network calls.
     """
     def __init__(self):
         self.options = DEFAULTS
+        # Last time CFS was called to update the options
+        self._last_update: Optional[float] = None
+        # Prevent multiple threads from updating options at the same time
+        self._update_lock = threading.Lock()
 
-    def update(self):
-        """Refreshes the cached options data"""
+    def update(self, force: bool=True) -> None:
+        """
+        If force is true OR if the options have not been updated
+        within OPTIONS_UPDATE_INTERVAL, then calls _update() to
+        refresh the cached options data
+        """
+        if not force and not self._update_needed:
+            # force option not specified, and we have a recent
+            # refresh, so return
+            return
+        # Take the options update lock
+        with self._update_lock:
+            # Check again if it's still needed (it's possible
+            # another thread updated them in the meantime)
+            if not force and not self._update_needed:
+                # force option not specified, and we have a recent
+                # refresh, so return
+                return
+            # Update the options
+            self._update()
+
+    def _update(self) -> None:
+        """Refreshes the cached options data -- assumes lock is held"""
+        LOGGER.debug("Refreshing cached options data")
         options = self._read_options()
         self.options.update(options)
         patch = {}
@@ -63,11 +95,13 @@ class Options:
             if key.lower() not in lower_options:
                 LOGGER.info("Setting option {} to {}.".format(key, str(value)))
                 patch[key] = value
+        # Update the last-updated timestamp
+        self._last_update = time.time()
         if patch:
             self._patch_options(patch)
 
     def _read_options(self):
-        """Retrieves the current options from the CFS api"""
+        """Retrieves the current options from the CFS API"""
         session = requests_retry_session()
         try:
             response = session.get(ENDPOINT)
@@ -82,7 +116,7 @@ class Options:
         return {}
 
     def _patch_options(self, obj):
-        """Add missing options to the CFS api"""
+        """Add missing options to the CFS API"""
         session = requests_retry_session()
         try:
             response = session.patch(ENDPOINT, json=obj)
@@ -94,6 +128,12 @@ class Options:
 
     def get_option(self, key, type):
         return type(self.options[key])
+
+    @property
+    def _update_needed(self) -> bool:
+        if self._last_update is None:
+            return True
+        return time.time() - self._last_update >= OPTIONS_UPDATE_INTERVAL
 
     @property
     def session_ttl(self):

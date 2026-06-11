@@ -52,7 +52,7 @@ except ConfigException:  # pragma: no cover
 
 _api_client = client.ApiClient()
 k8sjobs = client.BatchV1Api(_api_client)
-
+_network_ready = False
 
 def session_cleanup():
     """
@@ -61,7 +61,6 @@ def session_cleanup():
     while True:
         time.sleep(60 * 5)  # Run every 5 minutes
         try:
-            options.update()
             update_logging()
             ttl = options.session_ttl
             if ttl:
@@ -80,6 +79,8 @@ def monotonic_liveliness_heartbeat():
     while True:
         Timestamp()
         time.sleep(10)
+        if _network_ready:
+            update_logging()
 
 
 def main(env):
@@ -116,7 +117,8 @@ def _init_env():
 
 
 def _wait_for_networking_setup():
-    # This is an arbitrary kubernetes call to test connectivity
+    global _network_ready
+    # This is an arbitrary Kubernetes call to test connectivity
     while True:
         try:
             k8sjobs.get_api_resources()
@@ -125,15 +127,17 @@ def _wait_for_networking_setup():
             time.sleep(1)
             continue
         LOGGER.info('Networking is available.  Continuing with startup')
+        _network_ready = True
         return
 
 
 if __name__ == '__main__':
-    Timestamp()  # Initialize our watch timestamp
     setup_logging()
+    Timestamp()  # Initialize our watch timestamp
     env = _init_env()
     _wait_for_networking_setup()
 
+    update_logging(update_options=True)
     version = get_distribution('cray-cfs').version
     LOGGER.info('Starting CFS Operator version=%s', version)
     main(env)

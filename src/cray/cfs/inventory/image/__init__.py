@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2019, 2021-2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2019-2026 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -46,6 +46,7 @@ from requests.packages.urllib3.util.retry import Retry
 from yaml import safe_dump
 
 from cray.cfs.inventory import CFSInventoryBase, CFSInventoryError
+from cray.cfs.logging import update_logging
 import cray.cfs.operator.cfs.configurations as cfs_configurations
 import cray.cfs.operator.cfs.sessions as cfs_sessions
 
@@ -273,6 +274,7 @@ class ImageRootInventory(CFSInventoryBase):
         start_time = datetime.now()
         LOGGER.debug("Retrieving IMS job status for job=%s image=%s", job_id, ims_id)
         while True:
+            update_logging()
             try:
                 resp = session.get("http://{}:{}/jobs/{}".format(host, port, job_id))
                 resp.raise_for_status()
@@ -344,6 +346,7 @@ class ImageRootInventory(CFSInventoryBase):
         start_time = datetime.now()
         LOGGER.info("Checking ssh availability")
         while True:
+            update_logging()
             elapsed = (datetime.now() - start_time).seconds
             LOGGER.info(
                 "Waiting for SSH to be available at %s:%s. Elapsed time=%ss", host,
