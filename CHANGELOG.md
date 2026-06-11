@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+- Updated `certifi` from `2023.7.22` to `2024.7.4` to resolve CVE https://github.com/advisories/GHSA-248v-346w-9cwc
+
 ## [1.36.3] - 06/11/2026
 
 ### Changed
