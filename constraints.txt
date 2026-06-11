@@ -19,7 +19,7 @@ google-auth>=2.16.3,<2.17
 hvac==2.3.0
 idna>=3.4,<3.5
 Jinja2>=3.0.3,<3.1
-kafka-python>=2.0,<2.1
+kafka-python>=2.3,<2.4
 # CSM 1.7 moved to Kubernetes 1.32, so use client v32.x to ensure compatability
 kubernetes>=32.0.1,<33.0
 liveness>=1.4,<1.5

@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Small logging improvements
 
+### Dependencies
+- Update to `kafka-python` 2.3
+
 ## [1.36.2] - 05/20/2026
 
 ### Dependencies
