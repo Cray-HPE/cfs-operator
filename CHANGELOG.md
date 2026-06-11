@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 - Updated `certifi` from `2023.7.22` to `2024.7.4` to resolve CVE https://github.com/advisories/GHSA-248v-346w-9cwc
 - Update constraint on `py` from `1.8.2` to `1.10` to resolve CVE https://github.com/advisories/GHSA-hj5v-574p-mj7c
+- Update constraint on `virtualenv` from `15.2.0` to `20.36.1` to resolve CVEs:
+    - https://github.com/advisories/GHSA-rqc4-2hc7-8c8v
+    - https://github.com/advisories/GHSA-597g-3phw-6986
 
 ## [1.36.3] - 06/11/2026
 

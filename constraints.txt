@@ -56,6 +56,6 @@ six>=1.17.0,<1.18
 smmap>=5.0.2
 ujson>=5.12,<5.13
 urllib3>=2.7,<2.8
-virtualenv==15.2.0
+virtualenv>=20.36.1,<20.37
 websocket-client>=1.5.3,<1.6
 wheel>=0.45.1,<0.46
