@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.36.4] - 07/27/2026
+
 ### Dependencies
 - Updated `certifi` from `2023.7.22` to `2024.7.4` to resolve CVE https://github.com/advisories/GHSA-248v-346w-9cwc
 - Update constraint on `py` from `1.8.2` to `1.10` to resolve CVE https://github.com/advisories/GHSA-hj5v-574p-mj7c
