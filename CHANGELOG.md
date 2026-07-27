@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update constraint on `virtualenv` from `15.2.0` to `20.36.1` to resolve CVEs:
     - https://github.com/advisories/GHSA-rqc4-2hc7-8c8v
     - https://github.com/advisories/GHSA-597g-3phw-6986
+- Update constraint on `cryptography` from `46.0.5` to `48.0.1` to resolve CVE https://snyk.io/vuln/SNYK-PYTHON-CRYPTOGRAPHY-17344551
+- Update constraint on `paramiko` from `2.11` to `5.0` and constraint on
+  `bcrypt` from `3.1.7` to `5.0` to resolve CVEs:
+    - https://github.com/advisories/GHSA-45x7-px36-x8w8
+    - https://github.com/advisories/GHSA-r374-rxx8-8654
 
 ## [1.36.3] - 06/11/2026
 
