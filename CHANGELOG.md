@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+
+- Updates to resolve CVEs:
+    - Update `idna` from `3.4` to `3.15`
+    - Update `requests` from `2.31` to `2.33`
+    - Update `setuptools` from `80.9` to `83`
+    - Update `ujson` from `5.12.1` to `5.13`
+
 ## [1.36.4] - 07/27/2026
 
 ### Dependencies
