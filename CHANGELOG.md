@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.36.5] - 07/31/2026
+
 ### Dependencies
 
 - Updates to resolve CVEs:
+    - Update `cray-aee` from `1.22` to `1.23`
     - Update `idna` from `3.4` to `3.15`
     - Update `requests` from `2.31` to `2.33`
     - Update `setuptools` from `80.9` to `83`
